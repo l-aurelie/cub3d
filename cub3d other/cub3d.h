@@ -22,12 +22,6 @@
 
 typedef struct	s_ra
 {
-	double	fov_angle;
-	double	ray_angle;
-	double	nb_rays;
-	int		wall_hit_x;
-	int		wall_hit_y;
-	double	distance;
 }				t_ra;
 
 
@@ -35,10 +29,13 @@ typedef struct	s_ca
 {
 	double	x;
 	double	y;
-	int		radius;
+	double	xdir;
+	double	ydir;
+	double	xplane;
+	double	yplane;
+
 	int		turn_dir;
 	int		walk_dir;
-	double 	rotate_angle;
 	double	move_speed;
 	double	rotate_speed; 
 }				t_ca;
@@ -70,9 +67,6 @@ typedef struct	s_co
 
 typedef struct	s_m
 {
-	int		sq_size;
-	int		width;
-	int		heigth;
 	char 	*s_map;
 	int		**grid;
 }				t_m;
@@ -87,13 +81,9 @@ typedef struct	s_d
 	t_ra	ray;
 }				t_d;
 
-void	disp_square(int x, int y, int color, t_d data, int width);
 int		deal_key(int key, t_ca *cam);
 void	ft_set_params(t_d *data);
-void    glbDrawLine(int firstx,int firsty,int lastx,int lasty, int color, t_d data);
 void	parse_map(char *map, t_d *data);
-void	ft_set_map(t_m *map);
 void	my_mlx_pixel_put(t_d data, int x, int y, int color);
-void	print_map(t_m map);
 
 #endif

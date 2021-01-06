@@ -161,7 +161,7 @@ if(!(data->ray.ray_angle < 0.5 * M_PI || data->ray.ray_angle > 1.5 * M_PI))//lef
 	ystep = data->map.sq_size;
 	if(!(data->ray.ray_angle > 0 && data->ray.ray_angle < M_PI))//up
 		ystep *= -1;
-	printf("ray = %f, ")
+	printf("ray = %f, tan = %f\n", data->ray.ray_angle, tan(data->ray.ray_angle));
 	xstep = data->map.sq_size / tan(data->ray.ray_angle);
 	if (!(data->ray.ray_angle < (0.5 * M_PI) || data->ray.ray_angle > (1.5 * M_PI))/*left*/ && xstep > 0)
 		xstep *= -1;
@@ -203,7 +203,7 @@ void	cast_rays(t_d *data)
 	column_id = 0;
 	
 	data->ray.ray_angle = data->cam.rotate_angle - (data->ray.fov_angle /2);
-	while (column_id < 1/*data->ray.nb_rays*/)
+	while (column_id < data->ray.nb_rays)
 	{
 		glbDrawLine(data->cam.x, data->cam.y, data->cam.x + cos(data->ray.ray_angle) * 30, data->cam.y + sin(data->ray.ray_angle) * 30, 0x00ff00, *data);
 		data->ray.ray_angle += data->ray.fov_angle/data->ray.nb_rays;
