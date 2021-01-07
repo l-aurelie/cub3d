@@ -141,6 +141,9 @@ void	calcul_hit_dist(t_d *data)
 {
 	data->ray.h_dist = 0;//TODO = supprimer
        	data->ray.v_dist = 0;//TODO = supprimer
+	data->ray.final_dist == 0;//a ??supp??
+
+	printf("BEFORE distH = %f, distV = %f, dist = %f\n", data->ray.final_dist, data->ray.h_hit_x, data->ray.v_hit_y);
 	if(data->ray.found_h == 1)
 		data->ray.h_dist = calcul_dist(data->cam.x, data->ray.h_hit_x, data->cam.y, data->ray.h_hit_y);
 	if(data->ray.found_v == 1)
@@ -170,12 +173,14 @@ void	calcul_hit_dist(t_d *data)
 	else
 	{
 		printf("4\n");
+
 		data->ray.final_dist = data->ray.h_dist;
 		data->ray.hit_x = data->ray.h_hit_x;//sup
 		data->ray.hit_y = data->ray.h_hit_y;//sup
-
 	}
-	printf("distH = %f, distV = %f, dist = %f\n", data->ray.final_dist, data->ray.h_hit_x, data->ray.v_hit_y);
+	printf("dist = %f, distH = %f, distV = %f\n", data->ray.final_dist, data->ray.h_dist, data->ray.v_dist);
+	my_mlx_pixel_put(*data, data->ray.h_hit_x, data->ray.h_hit_y, 0x000000);
+	my_mlx_pixel_put(*data, data->ray.v_hit_x, data->ray.v_hit_y, 0x000000);
 }
 
 void	find_hz_hit(t_d *data, int column_id)
@@ -293,7 +298,7 @@ void	cast_rays(t_d *data)
 	column_id = 0;
 	
 	data->ray.ray_angle = data->cam.rotate_angle - (data->ray.fov_angle /2);
-	while (column_id < 1/*data->ray.nb_rays*/)
+	while (column_id < data->ray.nb_rays)
 	{
 		glbDrawLine(data->cam.x, data->cam.y, data->cam.x + cos(data->ray.ray_angle) * 30, data->cam.y + sin(data->ray.ray_angle) * 30, 0x00ff00, *data);
 		data->ray.ray_angle += data->ray.fov_angle/data->ray.nb_rays;
