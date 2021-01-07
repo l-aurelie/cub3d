@@ -25,9 +25,17 @@ typedef struct	s_ra
 	double	fov_angle;
 	double	ray_angle;
 	double	nb_rays;
-	int		wall_hit_x;
-	int		wall_hit_y;
-	double	distance;
+	int	found_v;
+	double	v_hit_x;
+	double	v_hit_y;
+	double	v_dist;
+	int	found_h;
+	double	h_hit_x;
+	double	h_hit_y;
+	double	h_dist;
+	double	hit_x;
+	double	hit_y;
+	double	final_dist;
 }				t_ra;
 
 

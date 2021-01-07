@@ -1,6 +1,8 @@
 #include "cub3d.h"
 #include <math.h>
 
+//TODO = memset data 
+
 int		key_press(int key, t_ca *cam)
 {
 	if (key == KEY_S)//devant
@@ -92,8 +94,8 @@ void	ft_set_params(t_d *data)
 	data->ptr.img = mlx_new_image(data->ptr.mlx, data->res.width, data->res.heigth);
 	data->ptr.imgs = mlx_get_data_addr(data->ptr.img, &data->color.bits_per_pixel, &data->res.size_line, &data->color.endian);
 //======player
-	data->cam.x = 130;
-	data->cam.y = 241;
+	data->cam.x = 200;
+	data->cam.y = 200;
 	data->cam.radius = 3;
 	data->cam.turn_dir = 0;
 	data->cam.walk_dir = 0;
@@ -130,19 +132,62 @@ double	normalize_angle(double angle)
 	return(angle);
 }
 
+double	calcul_dist(double x1, double x2, double y1, double y2)
+{
+	return(sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 -y1)));
+}
+
+void	calcul_hit_dist(t_d *data)
+{
+	data->ray.h_dist = 0;//TODO = supprimer
+       	data->ray.v_dist = 0;//TODO = supprimer
+	if(data->ray.found_h == 1)
+		data->ray.h_dist = calcul_dist(data->cam.x, data->ray.h_hit_x, data->cam.y, data->ray.h_hit_y);
+	if(data->ray.found_v == 1)
+		data->ray.v_dist = calcul_dist(data->cam.x, data->ray.v_hit_x, data->cam.y, data->ray.v_hit_y);
+	
+	if(data->ray.h_dist == 0)
+	{
+		printf("1 \n");
+		data->ray.final_dist = data->ray.v_dist;
+		data->ray.hit_x = data->ray.v_hit_x;//sup
+		data->ray.hit_y = data->ray.v_hit_y;//sup
+	}
+	else if (data->ray.v_dist == 0)
+	{
+		printf("2\n");
+		data->ray.final_dist = data->ray.h_dist;
+		data->ray.hit_x = data->ray.h_hit_x;//sup
+		data->ray.hit_y = data->ray.h_hit_y;//sup
+	}
+	else if (data->ray.h_dist > data->ray.v_dist)
+	{
+		printf("3\n");
+		data->ray.final_dist = data->ray.v_dist;
+		data->ray.hit_x = data->ray.v_hit_x;//sup
+		data->ray.hit_y = data->ray.v_hit_y;//sup
+	}
+	else
+	{
+		printf("4\n");
+		data->ray.final_dist = data->ray.h_dist;
+		data->ray.hit_x = data->ray.h_hit_x;//sup
+		data->ray.hit_y = data->ray.h_hit_y;//sup
+
+	}
+	printf("distH = %f, distV = %f, dist = %f\n", data->ray.final_dist, data->ray.h_hit_x, data->ray.v_hit_y);
+}
+
 void	find_hz_hit(t_d *data, int column_id)
 {
 	double	x_intercept; 
 	double	y_intercept;
 	double	xstep;
 	double	ystep;
-	double	next_ho_x; 
-	double	next_ho_y;
-	int		found; 
-	double	hit_x;
-	double	hit_y;
+	double	next_x; 
+	double	next_y;
 
-	found = 0; 
+	data->ray.found_h = 0; 
 	/*if(data->ray.ray_angle > 0 && data->ray.ray_angle < M_PI)//down
 		printf("angle down\n");
 	if(!(data->ray.ray_angle > 0 && data->ray.ray_angle < M_PI))//up
@@ -161,37 +206,82 @@ if(!(data->ray.ray_angle < 0.5 * M_PI || data->ray.ray_angle > 1.5 * M_PI))//lef
 	ystep = data->map.sq_size;
 	if(!(data->ray.ray_angle > 0 && data->ray.ray_angle < M_PI))//up
 		ystep *= -1;
-	printf("ray = %f, ")
 	xstep = data->map.sq_size / tan(data->ray.ray_angle);
 	if (!(data->ray.ray_angle < (0.5 * M_PI) || data->ray.ray_angle > (1.5 * M_PI))/*left*/ && xstep > 0)
 		xstep *= -1;
 	if((data->ray.ray_angle < 0.5 * M_PI || data->ray.ray_angle > 1.5 * M_PI)/*right*/ && xstep < 0)
 		xstep *= -1;
-	next_ho_x = x_intercept;
-	next_ho_y = y_intercept;
+	next_x = x_intercept;
+	next_y = y_intercept;
 
 	if(!(data->ray.ray_angle > 0 && data->ray.ray_angle < M_PI))//up
-		next_ho_y--;
-	//my_mlx_pixel_put(*data, x_intercept, y_intercept, 0x000000);
-	printf("ray angle = %f\n", data->ray.ray_angle);
-	printf("yint = %f, xint = %f\n", y_intercept, x_intercept);
-	printf("ystep = %f, xstep = %f\n", ystep, xstep);
-	while (next_ho_x >= 0 && next_ho_x <= data->res.width && next_ho_y >= 0 && next_ho_y <= data->res.heigth)
+		next_y--;
+	while (next_x >= 0 && next_x <= data->res.width && next_y >= 0 && next_y <= data->res.heigth)
 	{
-		//printf("while\n");	
-		my_mlx_pixel_put(*data, next_ho_x, next_ho_y, 0x000000);
-		if(has_wall(next_ho_x, next_ho_y, *data))
+		if(has_wall(next_x, next_y, *data) == '1')
 		{
-			found = 1;
-			hit_x = next_ho_x;
-			hit_y = next_ho_y;
-			glbDrawLine(data->cam.x, data->cam.y, hit_x, hit_y, 0x00ff00, *data);
+			data->ray.found_h = 1;
+			data->ray.h_hit_x = next_x;
+			data->ray.h_hit_y = next_y;
 			break;
 		}
 		else
 		{
-		 	next_ho_x += xstep;
-			next_ho_y += ystep;
+		 	next_x += xstep;
+			next_y += ystep;
+		}
+	}	
+}
+
+void	find_vt_hit(t_d *data, int column_id)
+{
+	double	x_intercept; 
+	double	y_intercept;
+	double	xstep;
+	double	ystep;
+	double	next_x; 
+	double	next_y;
+
+	data->ray.found_v = 0; 
+//======intercept x
+	x_intercept = floor(data->cam.y/data->map.sq_size) * data->map.sq_size;
+	if(data->ray.ray_angle < 0.5 * M_PI || data->ray.ray_angle > 1.5 * M_PI)/*right*/ 
+		x_intercept += data->map.sq_size;
+//-------intercept y
+	y_intercept = data->cam.y + (x_intercept - data->cam.x) * tan(data->ray.ray_angle);
+
+//=======xstep
+	xstep = data->map.sq_size;
+	if (!(data->ray.ray_angle < (0.5 * M_PI) || data->ray.ray_angle > (1.5 * M_PI))/*left*/)
+		xstep *= -1;
+//-------ystep
+	ystep = data->map.sq_size * tan(data->ray.ray_angle);
+	if(!(data->ray.ray_angle > 0 && data->ray.ray_angle < M_PI)/*up*/ && ystep > 0)
+		ystep *= -1;
+	if((data->ray.ray_angle > 0 && data->ray.ray_angle < M_PI)/*down*/ && ystep < 0)
+		ystep *= -1;
+//=======next
+	next_x = x_intercept;
+	next_y = y_intercept;
+	if (!(data->ray.ray_angle < (0.5 * M_PI) || data->ray.ray_angle > (1.5 * M_PI))/*left*/)
+		next_x--;
+	//my_mlx_pixel_put(*data, x_intercept, y_intercept, 0x000000);
+	//printf("ray angle = %f\n", data->ray.ray_angle);
+	//printf("yint = %f, xint = %f\n", y_intercept, x_intercept);
+	//printf("ystep = %f, xstep = %f\n", ystep, xstep);
+	while (next_x >= 0 && next_x <= data->res.width && next_y >= 0 && next_y <= data->res.heigth)
+	{
+		if(has_wall(next_x, next_y, *data) == '1')
+		{
+			data->ray.found_v = 1;
+			data->ray.v_hit_x = next_x;
+			data->ray.v_hit_y = next_y;
+			break;
+		}
+		else
+		{
+		 	next_x += xstep;
+			next_y += ystep;
 		}
 	}	
 }
@@ -209,7 +299,10 @@ void	cast_rays(t_d *data)
 		data->ray.ray_angle += data->ray.fov_angle/data->ray.nb_rays;
 	
 		find_hz_hit(data, column_id);
-	//	find_vt_hit();	
+		find_vt_hit(data, column_id);
+		calcul_hit_dist(data);
+		glbDrawLine(data->cam.x, data->cam.y, data->ray.hit_x, data->ray.hit_y, 0x00ff00, *data);
+
 	column_id++;
 	}
 }
