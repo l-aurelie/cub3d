@@ -90,7 +90,7 @@ void	disp_vertical_line(t_d data, int x, int y1, int y2, int color)
 	int i;
 	int j;
  
-	printf("y1 = %d, y2 = %d, x =%d(%d)\n", y1, y2, x, data.res.width);
+//	printf("y1 = %d, y2 = %d, x =%d(%d)\n", y1, y2, x, data.res.width);
  	if (y1 < 0)
 	{
 		y1 = 0;
@@ -100,7 +100,7 @@ void	disp_vertical_line(t_d data, int x, int y1, int y2, int color)
 	{
 		y2 = data.res.heigth;
 	}
-	printf("y1 = %d, y2 = %d, x =%d(%d)\n", y1, y2, x, data.res.width);
+//	printf("y1 = %d, y2 = %d, x =%d(%d)\n", y1, y2, x, data.res.width);
 	while (j < y2)
 	{
 		i = 0;

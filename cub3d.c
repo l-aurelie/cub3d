@@ -163,16 +163,15 @@ void	ray_dir(t_d *data)
 	data->ray.up = 0;
 	data->ray.right = 0;
 	data->ray.left = 0;
-
+	
 	if(data->ray.ray_angle > 0 && data->ray.ray_angle < M_PI)//down
 		data->ray.down = 1;
 	if(!(data->ray.ray_angle > 0 && data->ray.ray_angle < M_PI))//up
 		data->ray.up = 1;
 	if(data->ray.ray_angle < 0.5 * M_PI || data->ray.ray_angle > 1.5 * M_PI)//right
 		data->ray.right = 1;
-if(!(data->ray.ray_angle < 0.5 * M_PI || data->ray.ray_angle > 1.5 * M_PI))//left
-	data->ray.left = 1;
-
+	if(!(data->ray.ray_angle < 0.5 * M_PI || data->ray.ray_angle > 1.5 * M_PI))//left
+		data->ray.left = 1;
 }
 
 double	calcul_dist(double x1, double x2, double y1, double y2)
@@ -214,9 +213,8 @@ void	calcul_hit_dist(t_d *data)
 		data->ray.hit_x = data->ray.h_hit_x;//sup
 		data->ray.hit_y = data->ray.h_hit_y;//sup
 	}
-//	printf("dist = %f, H=%f, V =%f\n", data->ray.final_dist, data->ray.h_dist, data->ray.v_dist);
-//	my_mlx_pixel_put(*data, data->ray.h_hit_x, data->ray.h_hit_y, 0x000000);
-//	my_mlx_pixel_put(*data, data->ray.v_hit_x, data->ray.v_hit_y, 0x000000);
+	my_mlx_pixel_put(*data, data->ray.h_hit_x, data->ray.h_hit_y, 0x000000);//a supp
+	my_mlx_pixel_put(*data, data->ray.v_hit_x, data->ray.v_hit_y, 0x000000);//a supp
 }
 
 void	find_hz_hit(t_d *data, int column_id)
@@ -247,20 +245,17 @@ void	find_hz_hit(t_d *data, int column_id)
 		xstep *= -1;
 	next_x = x_intercept;
 	next_y = y_intercept;
-//	if(data->ray.up)//up
-//		next_y--;
 	while (next_x >= 0 && next_x <= data->res.width && next_y >= 0 && next_y <= data->res.heigth)
 	{
 		y = next_y;
 		if(data->ray.up)//up
 			y--;
 
-		if(has_wall(next_x, y, *data) == '1')
+		if(has_wall(next_x, y, *data) == '1' ||has_wall(next_x, y, *data) == ' ')//TODO laisser ' '?
 		{
 			data->ray.found_h = 1;
 			data->ray.h_hit_x = next_x;
 			data->ray.h_hit_y = next_y;
-			//draw_line(data->cam.x, data->cam.y, data->ray.h_hit_x, data->ray.h_hit_y, 0x00ff00, *data);
 			break;
 		}
 		else
@@ -302,20 +297,17 @@ void	find_vt_hit(t_d *data, int column_id)
 //=======next
 	next_x = x_intercept;
 	next_y = y_intercept;
-//	if (data->ray.left)
-//		next_x--;
 	while (next_x >= 0 && next_x <= data->res.width && next_y >= 0 && next_y <= data->res.heigth)
 	{
 		x = next_x;
 		if (data->ray.left)
 			x--;
 
-		if(has_wall(x, next_y, *data) == '1')
+		if(has_wall(x, next_y, *data) == '1' ||has_wall(x, next_y, *data) == ' ')//TODO laisser ' '?
 		{
 			data->ray.found_v = 1;
 			data->ray.v_hit_x = next_x;
 			data->ray.v_hit_y = next_y;
-			//draw_line(data->cam.x, data->cam.y, data->ray.v_hit_x, data->ray.v_hit_y, 0x00ff00, *data);
 			break;
 		}
 		else
@@ -352,14 +344,15 @@ void	cast_rays(t_d *data)
 	while (column_id < data->ray.nb_rays)
 	{
 		data->ray.ray_angle += data->ray.fov_angle/data->ray.nb_rays;
+		data->ray.ray_angle = normalize_angle(data->ray.ray_angle);
 		ray_dir(data);	
 		find_hz_hit(data, column_id);
 		find_vt_hit(data, column_id);
 		calcul_hit_dist(data);
 //3d======		
-		//wall_display(data, column_id);
+		wall_display(data, column_id);
 //2d======
-		draw_line(data->cam.x, data->cam.y, data->ray.hit_x , data->ray.hit_y, 0x00ff00, *data);
+		//draw_line(data->cam.x, data->cam.y, data->ray.hit_x , data->ray.hit_y, 0x00ff00, *data);
 		column_id++;
 	}
 }
@@ -387,18 +380,19 @@ int		ft_loop(t_d *data)
 		data->cam.y = old_y;
 	}
 //DISPLAY========
-	ft_disp_map(data->map, data->ptr, *data);
+/*	ft_disp_map(data->map, data->ptr, *data);
 	disp_square(data->cam.x, data->cam.y, 0xffff00, *data, 3);
-	draw_line(data->cam.x, data->cam.y, data->ray.hit_x, data->ray.hit_y, 0x00ff00, *data);
 
 	cast_rays(data);
-	draw_line(data->cam.x, data->cam.y, (data->cam.x + cos(data->cam.rotate_angle) * 30), (data->cam.y + sin(data->cam.rotate_angle) * 30), 0x000000, *data);
-/*//========mini map	
+	draw_line(data->cam.x, data->cam.y, (data->cam.x + cos(data->cam.rotate_angle) * 30), (data->cam.y + sin(data->cam.rotate_angle) * 30), 0x000000, *data);*/
+//========mini map	
+	
+	cast_rays(data);
 	ft_disp_minimap(data->map, data->ptr, *data);
 	disp_square(data->cam.x * 0.2, data->cam.y * 0.2, 0xffff00, *data, 3 * 0.2);	
 	draw_line(data->cam.x * 0.2, data->cam.y * 0.2, data->ray.hit_x * 0.2, data->ray.hit_y * 0.2, 0x00ff00, *data);
 	draw_line(data->cam.x * 0.2, data->cam.y * 0.2, (data->cam.x + cos(data->cam.rotate_angle) * 30) * 0.2, (data->cam.y + sin(data->cam.rotate_angle) * 30) * 0.2, 0x000000, *data);
-*/	
+	
 	mlx_put_image_to_window(data->ptr.mlx, data->ptr.window, data->ptr.img, 0, 0);
 	mlx_do_sync(data->ptr.mlx);
 	return (0);
@@ -419,13 +413,3 @@ int		main(int argc, char **argv)
 	mlx_loop_hook(data.ptr.mlx, ft_loop, &data);
 	mlx_loop(data.ptr.mlx);
 }
-
-	//img_s = (int *)data.ptr.imgs;
-	//pos = 0;
-	//while (pos < data.res.width * data.res.heigth)
-	//{
-	//	img_s[pos] = 0x00FF0000;
-	//	pos++;
-	//}
-	//mlx_key_hook(ptr.window, deal_key, (void *)&cam);
-

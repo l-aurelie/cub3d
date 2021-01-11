@@ -86,7 +86,7 @@ typedef struct	s_co
 
 typedef struct	s_m
 {
-	int		sq_size;
+	double	sq_size;
 	int		width;
 	int		heigth;
 	char 	*s_map;
