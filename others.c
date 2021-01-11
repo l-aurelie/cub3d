@@ -1,5 +1,27 @@
 #include "cub3d.h"
 
+int ft_abs(int x)
+{
+	if (x < 0)
+		x = -x;
+	return (x);
+}
+
+void	draw_line(int x0, int y0, int x1, int y1, int color, t_d data)
+{
+  int dx =  ft_abs (x1 - x0), sx = x0 < x1 ? 1 : -1;
+  int dy = -ft_abs (y1 - y0), sy = y0 < y1 ? 1 : -1; 
+  int err = dx + dy, e2; /* error value e_xy */
+ 
+  for (;;){  /* loop */
+			my_mlx_pixel_put(data, x0, y0, color);
+	if (x0 == x1 && y0 == y1) break;
+    e2 = 2 * err;
+    if (e2 >= dy) { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
+    if (e2 <= dx) { err += dx; y0 += sy; } /* e_xy+e_y < 0 */
+  }
+}
+
 /*void	disp_line(double a_x, double a_y, double b_x, double b_y, int color, t_p ptr)
 {
 	printf("disp_line\n");
@@ -62,6 +84,38 @@
 		y++;
 	}
 }*/
+
+void	disp_vertical_line(t_d data, int x, int y1, int y2, int color)
+{
+	int i;
+	int j;
+ 
+	printf("y1 = %d, y2 = %d, x =%d(%d)\n", y1, y2, x, data.res.width);
+ 	if (y1 < 0)
+	{
+		y1 = 0;
+	}
+	j = y1;
+ 	if (y2 > data.res.heigth)
+	{
+		y2 = data.res.heigth;
+	}
+	printf("y1 = %d, y2 = %d, x =%d(%d)\n", y1, y2, x, data.res.width);
+	while (j < y2)
+	{
+		i = 0;
+		while (i < data.res.width)//pas necessaire?
+		{	
+			if(i == x)
+//				mlx_pixel_put(data.ptr.mlx, data.ptr.window, i, j, 0xffffff);
+	
+				my_mlx_pixel_put(data, i, j, color);
+			i++;
+		}
+		j++;
+	}
+
+}
 
 void	my_mlx_pixel_put(t_d data, int x, int y, int color)
 {

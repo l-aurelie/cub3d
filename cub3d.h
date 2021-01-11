@@ -25,14 +25,22 @@ typedef struct	s_ra
 	double	fov_angle;
 	double	ray_angle;
 	double	nb_rays;
-	int	found_v;
+
+	int		down;
+	int		up;
+	int		right;
+	int		left;
+
+	int		found_v;
 	double	v_hit_x;
 	double	v_hit_y;
 	double	v_dist;
-	int	found_h;
+
+	int		found_h;
 	double	h_hit_x;
 	double	h_hit_y;
 	double	h_dist;
+
 	double	hit_x;
 	double	hit_y;
 	double	final_dist;
@@ -64,7 +72,7 @@ typedef struct	s_p
 	void	*window;
 	void	*mlx;
 	void	*img; 
-	char	*imgs; 
+	char	*imgs;
 }				t_p;
 
 typedef struct	s_co
@@ -96,8 +104,10 @@ typedef struct	s_d
 }				t_d;
 
 void	disp_square(int x, int y, int color, t_d data, int width);
-int		deal_key(int key, t_ca *cam);
+//int		deal_key(int key, t_ca *cam);
 void	ft_set_params(t_d *data);
+void	disp_vertical_line(t_d data, int x, int y1, int y2, int color);
+void	draw_line(int x0, int y0, int x1, int y1, int color, t_d data);
 void    glbDrawLine(int firstx,int firsty,int lastx,int lasty, int color, t_d data);
 void	parse_map(char *map, t_d *data);
 void	ft_set_map(t_m *map);

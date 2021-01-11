@@ -75,7 +75,7 @@ void	ft_set_map(t_m *map)
 		i++;
 	}
 	map->grid = grid;
-//	print_map(*map); 
+	print_map(*map); 
 }
 
 void	parse_map(char *map, t_d *data)
