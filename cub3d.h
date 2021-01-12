@@ -79,7 +79,12 @@ typedef struct	s_co
 {
 	int		floor;
 	int		ceiling;
-	int		walls;
+	int		wall;
+	int		wall_north;
+	int		wall_south;
+	int		wall_west;
+	int		wall_east;
+
 	int		bits_per_pixel;
 	int		endian;
 }				t_co;
@@ -104,14 +109,13 @@ typedef struct	s_d
 }				t_d;
 
 void	disp_square(int x, int y, int color, t_d data, int width);
-//int		deal_key(int key, t_ca *cam);
 void	ft_set_params(t_d *data);
 void	disp_vertical_line(t_d data, int x, int y1, int y2, int color);
 void	draw_line(int x0, int y0, int x1, int y1, int color, t_d data);
-void    glbDrawLine(int firstx,int firsty,int lastx,int lasty, int color, t_d data);
 void	parse_map(char *map, t_d *data);
 void	ft_set_map(t_m *map);
 void	my_mlx_pixel_put(t_d data, int x, int y, int color);
 void	print_map(t_m map);
-
+void	ft_disp_minimap(t_m map, t_p ptr, t_d data);
+void	ft_disp_map(t_m map, t_p ptr, t_d data);
 #endif

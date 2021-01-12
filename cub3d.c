@@ -29,82 +29,6 @@ int		key_release(int key, t_ca *cam)
 	return (0);
 }
 
-void	print_map(t_m map)
-{
-	int i;
-	int j;
-
-	i = 0; 
-	j = 0;
-	while (i < map.heigth)
-	{	
-		j = 0;
-		while(j < map.width)
-		{
-			printf("%c", map.grid[i][j]);
-			j++;
-		}
-		printf("\n");
-		i++;
-	}
-}
-
-void	ft_disp_minimap(t_m map, t_p ptr, t_d data)
-{
-	//printf("disp_map_____________\n");
-	int i; 
-	int j;
-	int tileX;
-	int tileY;
-
-	i = 0;
-	j = 0;
-	while (j < map.heigth)
-	{
-		i = 0; 
-		while (i < map.width)
-		{
-			tileX = i * map.sq_size;	
-			tileY = j * map.sq_size;
-
-			if (map.grid[j][i] == '1')
-				disp_square(0.2 * tileX, 0.2 * tileY, 0xffffff, data, 0.2 * map.sq_size);
-			else
-				disp_square(0.2 * tileX, 0.2 * tileY, 0xff0000, data, 0.2 * map.sq_size);
-			i++;
-		}
-		j++;
-	}
-}	
-
-void	ft_disp_map(t_m map, t_p ptr, t_d data)
-{
-	//printf("disp_map_____________\n");
-	int i; 
-	int j;
-	int tileX;
-	int tileY;
-
-	i = 0;
-	j = 0;
-	while (j < map.heigth)
-	{
-		i = 0; 
-		while (i < map.width)
-		{
-			tileX = i * map.sq_size;	
-			tileY = j * map.sq_size;
-
-			if (map.grid[j][i] == '1')
-				disp_square(tileX, tileY, 0xffffff, data, map.sq_size);
-			else
-				disp_square(tileX, tileY, 0xff0000, data, map.sq_size);
-			i++;
-		}
-		j++;
-	}
-}	
-
 void	ft_set_params(t_d *data)
 {
 //=======res
@@ -130,7 +54,14 @@ void	ft_set_params(t_d *data)
 //======Rays
 	data->ray.fov_angle = 60 * (M_PI/180);
 	data->ray.nb_rays = data->res.width;
-}
+//======color
+	data->color.ceiling = 0x4b0082;
+	data->color.floor = 0xbaba9e;
+	data->color.wall = 0x0000ff;
+	data->color.wall_north = 0xff0000;
+	data->color.wall_south = 0x00ff00;
+	data->color.wall_west = 0xffffff;
+	data->color.wall_east = 0x0000ff;}
 
 char	has_wall(double x, double y, t_d data)
 {
@@ -206,15 +137,15 @@ void	calcul_hit_dist(t_d *data)
 		data->ray.final_dist = data->ray.v_dist;
 		data->ray.hit_x = data->ray.v_hit_x;//sup
 		data->ray.hit_y = data->ray.v_hit_y;//sup
+		data->ray.found_h = 0;
 	}
 	else
 	{
 		data->ray.final_dist = data->ray.h_dist;
 		data->ray.hit_x = data->ray.h_hit_x;//sup
 		data->ray.hit_y = data->ray.h_hit_y;//sup
+		data->ray.found_v = 0;
 	}
-	my_mlx_pixel_put(*data, data->ray.h_hit_x, data->ray.h_hit_y, 0x000000);//a supp
-	my_mlx_pixel_put(*data, data->ray.v_hit_x, data->ray.v_hit_y, 0x000000);//a supp
 }
 
 void	find_hz_hit(t_d *data, int column_id)
@@ -329,9 +260,19 @@ void	wall_display(t_d *data, int column_id)
 
 	wall_begin = (data->res.heigth / 2) - (wall_heigth / 2);
 	wall_end = wall_begin + wall_heigth;
-	disp_vertical_line(*data, column_id, 0, wall_begin - 1, 0x000000);//TODO est ce normal que limage ne se clear pas 
-	disp_vertical_line(*data, column_id, wall_begin, wall_end, 0xffffff);//TODO est ce normal que certaine hauteur de mur soient hors ecran ? certainement si on est trop proche? 
-	disp_vertical_line(*data, column_id, wall_end, data->res.heigth- 1, 0x000000); 
+
+	disp_vertical_line(*data, column_id, 0, wall_begin, data->color.ceiling);//TODO est ce normal que limage ne se clear pas 
+	disp_vertical_line(*data, column_id, wall_end, data->res.heigth, data->color.floor);
+
+ 	//disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall);//TODO est ce normal que certaine hauteur de mur soient hors ecran ? certainement si on est trop proche? 
+	if(data->ray.up && data->ray.found_h)//north
+		disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall_north);
+	else if(data->ray.down && data->ray.found_h)//south
+		disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall_south);
+	else if(data->ray.left && data->ray.found_v)//west
+		disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall_west);
+	else if(data->ray.right && data->ray.found_v)//east
+		disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall_east);
 }
 
 void	cast_rays(t_d *data)
