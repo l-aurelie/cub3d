@@ -4,24 +4,36 @@
 //TODO = memset data 
 
 int		key_press(int key, t_ca *cam)
-{
-	if (key == KEY_S)//devant
+{	
+	cam->side_move = 0;
+	if (key == KEY_A || key == KEY_D )
+		cam->side_move = 1;
+	if (key == KEY_W)//devant
 		cam->walk_dir = 1; 
-	else if (key == KEY_W)//bas
+	else if (key == KEY_S)//bas
 		cam->walk_dir = -1;
-	else if (key == KEY_LEFT)//gauche
+	else if (key == KEY_D)//droite 
+		cam->walk_dir = 1; 
+	else if (key == KEY_A)//gauche
+		cam->walk_dir = -1;
+	else if (key == KEY_LEFT)//rot_gauche
 		cam->turn_dir = -1;
-	else if (key == KEY_RIGHT)//dte
+	else if (key == KEY_RIGHT)//rot_dte
 		cam->turn_dir = 1;
 	return (0);
 }
 
 int		key_release(int key, t_ca *cam)
 {
-	if (key == KEY_S)//devant
+	if (key == KEY_W)//devant
 		cam->walk_dir = 0; 
-	else if (key == KEY_W)//bas
+	else if (key == KEY_S)//bas
 		cam->walk_dir = 0;
+	else if (key == KEY_D)//droite 
+		cam->walk_dir = 0; 
+	else if (key == KEY_A)//gauche
+		cam->walk_dir = 0;
+
 	else if (key == KEY_LEFT)//gauche
 		cam->turn_dir = 0;
 	else if (key == KEY_RIGHT)//dte
@@ -255,8 +267,11 @@ void	wall_display(t_d *data, int column_id)
 	double	wall_heigth;
 	int		wall_begin; 
 	int		wall_end;
+	double	correct_dist;
+
+	correct_dist = data->ray.final_dist * cos(data->ray.ray_angle - data->cam.rotate_angle);
 	dist_plane = (data->res.width / 2) / tan(data->ray.fov_angle / 2);
-	wall_heigth = data->map.sq_size / data->ray.final_dist * dist_plane;
+	wall_heigth = (data->map.sq_size / correct_dist) * dist_plane;
 
 	wall_begin = (data->res.heigth / 2) - (wall_heigth / 2);
 	wall_end = wall_begin + wall_heigth;
@@ -293,7 +308,7 @@ void	cast_rays(t_d *data)
 //3d======		
 		wall_display(data, column_id);
 //2d======
-		//draw_line(data->cam.x, data->cam.y, data->ray.hit_x , data->ray.hit_y, 0x00ff00, *data);
+//		draw_line(data->cam.x, data->cam.y, data->ray.hit_x , data->ray.hit_y, 0x00ff00, *data);
 		column_id++;
 	}
 }
@@ -313,15 +328,24 @@ int		ft_loop(t_d *data)
 	move_step = data->cam.walk_dir * data->cam.move_speed;
 	old_x = data->cam.x;
 	old_y = data->cam.y;
-	data->cam.x += cos(data->cam.rotate_angle) * move_step;
-	data->cam.y += sin(data->cam.rotate_angle) * move_step;
+	if (data->cam.side_move == 1)
+	{
+		data->cam.x += cos(data->cam.rotate_angle + M_PI_2) * move_step;
+		data->cam.y += sin(data->cam.rotate_angle + M_PI_2) * move_step;
+	}
+	else	
+	{
+		data->cam.x += cos(data->cam.rotate_angle) * move_step;
+		data->cam.y += sin(data->cam.rotate_angle) * move_step;
+	}
 	if (has_wall(data->cam.x, data->cam.y, *data) == '1')
 	{
 		data->cam.x = old_x;
 		data->cam.y = old_y;
 	}
 //DISPLAY========
-/*	ft_disp_map(data->map, data->ptr, *data);
+/*
+	ft_disp_map(data->map, data->ptr, *data);
 	disp_square(data->cam.x, data->cam.y, 0xffff00, *data, 3);
 
 	cast_rays(data);
@@ -333,7 +357,7 @@ int		ft_loop(t_d *data)
 	disp_square(data->cam.x * 0.2, data->cam.y * 0.2, 0xffff00, *data, 3 * 0.2);	
 	draw_line(data->cam.x * 0.2, data->cam.y * 0.2, data->ray.hit_x * 0.2, data->ray.hit_y * 0.2, 0x00ff00, *data);
 	draw_line(data->cam.x * 0.2, data->cam.y * 0.2, (data->cam.x + cos(data->cam.rotate_angle) * 30) * 0.2, (data->cam.y + sin(data->cam.rotate_angle) * 30) * 0.2, 0x000000, *data);
-	
+
 	mlx_put_image_to_window(data->ptr.mlx, data->ptr.window, data->ptr.img, 0, 0);
 	mlx_do_sync(data->ptr.mlx);
 	return (0);

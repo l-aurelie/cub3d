@@ -10,10 +10,10 @@
 
 # define KEY_LEFT 65361
 # define KEY_RIGHT 65363
-# define KEY_A 113
+# define KEY_A 97
 # define KEY_S 115
 # define KEY_D 100
-# define KEY_W 122
+# define KEY_W 119
 # define KEY_ESC 65307
 # define KEYPRESS 2
 # define KEYRELEASE 3
@@ -57,6 +57,7 @@ typedef struct	s_ca
 	double 	rotate_angle;
 	double	move_speed;
 	double	rotate_speed; 
+	int		side_move;
 }				t_ca;
 
 typedef struct	s_r
