@@ -76,6 +76,19 @@ typedef struct	s_p
 	char	*imgs;
 }				t_p;
 
+typedef struct	s_t
+{
+	char			*path;
+	void			*img;
+	char			*imgs;
+	int				width;
+	int				heigth;
+	int				bpp;
+	int				endian;
+	int				size_line;
+
+}				t_t;
+
 typedef struct	s_co
 {
 	int		floor;
@@ -86,6 +99,11 @@ typedef struct	s_co
 	int		wall_west;
 	int		wall_east;
 
+	t_t		no;
+	t_t		so;
+	t_t		we;
+	t_t		ea;
+	t_t		s;
 	int		bits_per_pixel;
 	int		endian;
 }				t_co;

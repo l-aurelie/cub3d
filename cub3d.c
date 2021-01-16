@@ -33,7 +33,6 @@ int		key_release(int key, t_ca *cam)
 		cam->walk_dir = 0; 
 	else if (key == KEY_A)//gauche
 		cam->walk_dir = 0;
-
 	else if (key == KEY_LEFT)//gauche
 		cam->turn_dir = 0;
 	else if (key == KEY_RIGHT)//dte
@@ -47,8 +46,6 @@ void	ft_set_params(t_d *data)
 	data->res.width = data->map.sq_size * data->map.width;
 	data->res.heigth = data->map.sq_size * data->map.heigth;
 //=======ptr
-
-	data->ptr.mlx = mlx_init();
 	if (!(data->ptr.window = mlx_new_window(data->ptr.mlx, data->res.width, data->res.heigth, "cube3d")))
 		exit(EXIT_FAILURE);
 //=======img
@@ -60,7 +57,7 @@ void	ft_set_params(t_d *data)
 	data->cam.radius = 3;
 	data->cam.turn_dir = 0;
 	data->cam.walk_dir = 0;
-	data->cam.rotate_angle = M_PI/2;
+	data->cam.rotate_angle = M_PI * 2;
 	data->cam.move_speed = 2.0;
 	data->cam.rotate_speed = 2 * (M_PI/180);
 //======Rays
@@ -261,6 +258,47 @@ void	find_vt_hit(t_d *data, int column_id)
 	}	
 }
 
+int		find_text_pixel(t_t text, int x_texture, int y_texture)
+{
+	char	*color;
+	//printf("x = %d, y = %d\n", x_texture, y_texture);
+	//printf("text.width = %d, text,heigth = %d\n", text.width, text.heigth);
+	if (y_texture < 0)
+		y_texture = 0;
+	if (y_texture > text.heigth)
+		y_texture = text.heigth;
+	if (x_texture < 0)
+		x_texture = 0;
+	if (x_texture > text.width)
+		x_texture = text.width;
+	color = text.imgs + (y_texture * text.size_line + x_texture * text.bpp / 8);
+	printf("color = %d\n", *(int *)color);
+	return (*(int*)color);
+}
+
+void	disp_wall_text(t_d *data, int col, int w_begin, int w_end, t_t *text, int wall_heigth)
+{
+	int x_texture;
+	int y_texture;
+	int color;
+
+	if(data->ray.found_v)
+		x_texture = fmod(data->ray.v_hit_y, 1) * text->width;
+	if(data->ray.found_h)
+		x_texture = fmod(data->ray.h_hit_x, 1) * text->width;
+	if (w_begin < 0)
+		w_begin = 0;
+	if (w_end > data->res.heigth)
+		w_end = data->res.heigth;
+	while (w_begin < w_end)
+	{
+		y_texture = (w_begin + (wall_heigth / 2.0) - (data->res.heigth / 2.0) * (text->heigth / wall_heigth));
+		printf("y = %d, w_begin = %d, wall_end = %d\n", y_texture, w_begin, w_end);
+		my_mlx_pixel_put(*data, col, w_begin, find_text_pixel(*text, x_texture, y_texture));
+		w_begin++;
+	}	
+}
+
 void	wall_display(t_d *data, int column_id)
 {
 	double	dist_plane;
@@ -278,8 +316,22 @@ void	wall_display(t_d *data, int column_id)
 
 	disp_vertical_line(*data, column_id, 0, wall_begin, data->color.ceiling);//TODO est ce normal que limage ne se clear pas 
 	disp_vertical_line(*data, column_id, wall_end, data->res.heigth, data->color.floor);
+//================wall Texture
+	if(data->ray.up && data->ray.found_h)//north
+		disp_wall_text(data, column_id, wall_begin, wall_end, &data->color.no, wall_heigth);
+	else if(data->ray.down && data->ray.found_h)//south
+		disp_wall_text(data, column_id, wall_begin, wall_end, &data->color.so, wall_heigth);
 
- 	//disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall);//TODO est ce normal que certaine hauteur de mur soient hors ecran ? certainement si on est trop proche? 
+	else if(data->ray.left && data->ray.found_v)//west
+		disp_wall_text(data, column_id, wall_begin, wall_end, &data->color.we, wall_heigth);
+
+	else if(data->ray.right && data->ray.found_v)//east
+		disp_wall_text(data, column_id, wall_begin, wall_end, &data->color.ea, wall_heigth);
+
+//====================================
+//====================================
+//=====WITHOUT TEXTURES
+/* 	//disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall);//TODO est ce normal que certaine hauteur de mur soient hors ecran ? certainement si on est trop proche? 
 	if(data->ray.up && data->ray.found_h)//north
 		disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall_north);
 	else if(data->ray.down && data->ray.found_h)//south
@@ -287,7 +339,7 @@ void	wall_display(t_d *data, int column_id)
 	else if(data->ray.left && data->ray.found_v)//west
 		disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall_west);
 	else if(data->ray.right && data->ray.found_v)//east
-		disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall_east);
+		disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall_east);*/
 }
 
 void	cast_rays(t_d *data)
@@ -369,10 +421,10 @@ int		main(int argc, char **argv)
 
 	int		pos;
 	int		*img_s;
-	
+
+	data.ptr.mlx = mlx_init();
 	parse_map(argv[1], &data);
 	ft_set_params(&data);
-
 	mlx_hook(data.ptr.window, KEYPRESS, 1L<<0, key_press, (void *)&data.cam);	
 	mlx_hook(data.ptr.window, KEYRELEASE, 1L<<1, key_release, (void *)&data.cam);
 	mlx_loop_hook(data.ptr.mlx, ft_loop, &data);
