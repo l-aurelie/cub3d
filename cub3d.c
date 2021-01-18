@@ -272,7 +272,7 @@ int		find_text_pixel(t_t text, int x_texture, int y_texture)
 	if (x_texture > text.width)
 		x_texture = text.width;
 	color = text.imgs + (y_texture * text.size_line + x_texture * text.bpp / 8);
-	printf("color = %d\n", *(int *)color);
+	//printf("color = %d\n", *(int *)color);
 	return (*(int*)color);
 }
 
@@ -280,22 +280,23 @@ void	disp_wall_text(t_d *data, int col, int w_begin, int w_end, t_t *text, int w
 {
 	int x_texture;
 	int y_texture;
+	int y;
 	int color;
 
 	if(data->ray.found_v)
-		x_texture = fmod(data->ray.v_hit_y, 1) * text->width;
+		x_texture = fmod(data->ray.v_hit_y / data->map.sq_size, 1) * text->width;
 	if(data->ray.found_h)
-		x_texture = fmod(data->ray.h_hit_x, 1) * text->width;
+		x_texture = fmod(data->ray.h_hit_x / data->map.sq_size, 1) * text->width;
 	if (w_begin < 0)
 		w_begin = 0;
 	if (w_end > data->res.heigth)
 		w_end = data->res.heigth;
-	while (w_begin < w_end)
+	y = w_begin;
+	while (y < w_end)
 	{
-		y_texture = (w_begin + (wall_heigth / 2.0) - (data->res.heigth / 2.0) * (text->heigth / wall_heigth));
-		printf("y = %d, w_begin = %d, wall_end = %d\n", y_texture, w_begin, w_end);
-		my_mlx_pixel_put(*data, col, w_begin, find_text_pixel(*text, x_texture, y_texture));
-		w_begin++;
+		y_texture = (y + (wall_heigth / 2.0) - (data->res.heigth / 2.0)) * ((double)text->heigth / (double)wall_heigth);
+		my_mlx_pixel_put(*data, col, y, find_text_pixel(*text, x_texture, y_texture));
+		y++;
 	}	
 }
 
