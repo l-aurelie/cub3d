@@ -58,8 +58,8 @@ void	ft_set_params(t_d *data)
 	data->cam.turn_dir = 0;
 	data->cam.walk_dir = 0;
 	data->cam.rotate_angle = M_PI * 2;
-	data->cam.move_speed = 2.0;
-	data->cam.rotate_speed = 2 * (M_PI/180);
+	data->cam.move_speed = 10.0;
+	data->cam.rotate_speed = 10 * (M_PI/180);
 //======Rays
 	data->ray.fov_angle = 60 * (M_PI/180);
 	data->ray.nb_rays = data->res.width;

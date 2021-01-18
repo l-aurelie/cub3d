@@ -5,17 +5,18 @@ void	parse_res(void)
 //	printf("coucou\n");
 }
 
-int	 	ft_is_blank_str(char *str)
+int		ft_str_is_numeric(char *str)
 {
 	int i;
-	
-	i = 0; 
-	while(str[i])
+
+	i = 0;
+	while (str[i])
 	{
-		if(str[i] != ' ')
+		if (!(str[i] >= '0' && str[i] <= '9'))
 			return (0);
+		i++;
 	}
-	return(1);
+	return (1);
 }
 
 int		count_strtab_elem(char **str)
@@ -152,8 +153,8 @@ void	print_tab(int *tab, int size)
 	}
 		printf("\n");
 }
-
-/*void	parse_color;
+/*
+void	parse_color(t_d *data, char *line)
 {
 	char **split;
 	char **color; 
@@ -164,9 +165,13 @@ void	print_tab(int *tab, int size)
 	color = ft_split(split[1], ',');
 	if (count_strtab_elem(split) != 3)
 		error("color rgb wrong number of element\n");
-	
-}*/
-
+	if(!ft_str_is_numeric(color[0]) || !ft_str_is_numeric(color[1]) || !ft_str_is_numeric(color[2]))
+		error("colors must be numeric\n");
+	if(!(ft_atoi(color[0] >= '0' && ft_yatoi(color[0] <= '255') || !(ft_atoi(color[1] >= '0' && ft_yatoi(color[1] <= '255') || !(ft_atoi(color[2] >= '0' && ft_yatoi(color[2] <= '255'))
+		error("color must be between 0 and 255\n");	
+	//if
+		}
+*/
 void	parse_map(char *map, t_d *data)
 {
 	int		fd;
