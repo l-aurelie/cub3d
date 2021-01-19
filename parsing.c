@@ -153,25 +153,34 @@ void	print_tab(int *tab, int size)
 	}
 		printf("\n");
 }
-/*
+
+void	find_int_color(int *color, int r, int g, int b)
+{
+		*color = (r << 16) + (g << 8) + b;
+		printf("color = %d\n", *color);
+}
 void	parse_color(t_d *data, char *line)
 {
 	char **split;
 	char **color; 
-	
+
 	split =	ft_split(line , ' ');
 	if (count_strtab_elem(split) != 2)
 		error("color element is wrong\n");
 	color = ft_split(split[1], ',');
-	if (count_strtab_elem(split) != 3)
+	if (count_strtab_elem(color) != 3)
 		error("color rgb wrong number of element\n");
 	if(!ft_str_is_numeric(color[0]) || !ft_str_is_numeric(color[1]) || !ft_str_is_numeric(color[2]))
 		error("colors must be numeric\n");
-	if(!(ft_atoi(color[0] >= '0' && ft_yatoi(color[0] <= '255') || !(ft_atoi(color[1] >= '0' && ft_yatoi(color[1] <= '255') || !(ft_atoi(color[2] >= '0' && ft_yatoi(color[2] <= '255'))
+	if(!(ft_atoi(color[0]) >= 0 && ft_atoi(color[0]) <= 255) || !(ft_atoi(color[1]) >= 0 && ft_atoi(color[1]) <= 255) || !(ft_atoi(color[2]) >= 0 && ft_atoi(color[2]) <= 255))
 		error("color must be between 0 and 255\n");	
-	//if
-		}
-*/
+	if (ft_strncmp(split[0], "C", 1) == 0)
+		find_int_color(&data->color.ceiling, ft_atoi(color[0]), ft_atoi(color[1]), ft_atoi(color[2]));
+	if (ft_strncmp(split[0], "F", 1) == 0)//changer pour strcmp
+		find_int_color(&data->color.floor, ft_atoi(color[0]), ft_atoi(color[1]), ft_atoi(color[2]));
+
+}
+
 void	parse_map(char *map, t_d *data)
 {
 	int		fd;
@@ -179,7 +188,7 @@ void	parse_map(char *map, t_d *data)
 	char	*map_elem;
 	int 	index;
 	int		all_elem[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	static void (*f[])() = {&parse_res, &parse_text, &parse_text, &parse_text, &parse_text, &parse_res, &parse_res, &parse_res};	
+	static void (*f[])() = {&parse_res, &parse_text, &parse_text, &parse_text, &parse_text, &parse_color, &parse_color};	
 	line = 0;
 	map_elem = "RNSWEFC";
 	fd = open(map, O_RDONLY);	

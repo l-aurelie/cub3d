@@ -93,12 +93,6 @@ typedef struct	s_co
 {
 	int		floor;
 	int		ceiling;
-	int		wall;
-	int		wall_north;
-	int		wall_south;
-	int		wall_west;
-	int		wall_east;
-
 	t_t		no;
 	t_t		so;
 	t_t		we;

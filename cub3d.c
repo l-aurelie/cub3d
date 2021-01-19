@@ -64,13 +64,9 @@ void	ft_set_params(t_d *data)
 	data->ray.fov_angle = 60 * (M_PI/180);
 	data->ray.nb_rays = data->res.width;
 //======color
-	data->color.ceiling = 0x4b0082;
-	data->color.floor = 0xbaba9e;
-	data->color.wall = 0x0000ff;
-	data->color.wall_north = 0xff0000;
-	data->color.wall_south = 0x00ff00;
-	data->color.wall_west = 0xffffff;
-	data->color.wall_east = 0x0000ff;}
+//	data->color.ceiling = 0x4b0082;
+//	data->color.floor = 0xbaba9e;
+}
 
 char	has_wall(double x, double y, t_d data)
 {
