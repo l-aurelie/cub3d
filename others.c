@@ -7,7 +7,7 @@ int ft_abs(int x)
 	return (x);
 }
 
-void	draw_line(int x0, int y0, int x1, int y1, int color, t_d data)
+void	draw_line(int x0, int y0, int x1, int y1, int color, t_d *data)
 {
   int dx =  ft_abs (x1 - x0), sx = x0 < x1 ? 1 : -1;
   int dy = -ft_abs (y1 - y0), sy = y0 < y1 ? 1 : -1; 
@@ -22,7 +22,7 @@ void	draw_line(int x0, int y0, int x1, int y1, int color, t_d data)
   }
 }
 
-void	disp_vertical_line(t_d data, int x, int y1, int y2, int color)
+void	disp_vertical_line(t_d *data, int x, int y1, int y2, int color)
 {
 	int j;
  
@@ -31,9 +31,9 @@ void	disp_vertical_line(t_d data, int x, int y1, int y2, int color)
 		y1 = 0;
 	}
 	j = y1;
- 	if (y2 > data.res.heigth)
+ 	if (y2 > data->res.heigth)
 	{
-		y2 = data.res.heigth;
+		y2 = data->res.heigth;
 	}
 	while (j < y2)
 	{
@@ -43,14 +43,14 @@ void	disp_vertical_line(t_d data, int x, int y1, int y2, int color)
 
 }
 
-void	my_mlx_pixel_put(t_d data, int x, int y, int color)
+void	my_mlx_pixel_put(t_d *data, int x, int y, int color)
 {
     char *dst;
-	dst = data.ptr.imgs + (y * data.res.size_line + x * (data.color.bits_per_pixel / 8));
+	dst = data->ptr.imgs + (y * data->res.size_line + x * (data->color.bits_per_pixel / 8));
 	*(unsigned int*)dst = color;
 }
 
-void	disp_square(int x, int y, int color, t_d data, int width)
+void	disp_square(int x, int y, int color, t_d *data, int width)
 {
 	int i;
 	int j;
@@ -88,7 +88,7 @@ void	print_map(t_m map)
 	}
 }
 
-void	ft_disp_minimap(t_m map, t_p ptr, t_d data)
+void	ft_disp_minimap(t_m map, t_p ptr, t_d *data)
 {
 	//printf("disp_map_____________\n");
 	int i; 
@@ -116,7 +116,7 @@ void	ft_disp_minimap(t_m map, t_p ptr, t_d data)
 	}
 }	
 
-void	ft_disp_map(t_m map, t_p ptr, t_d data)
+void	ft_disp_map(t_m map, t_p ptr, t_d *data)
 {
 	//printf("disp_map_____________\n");
 	int i; 

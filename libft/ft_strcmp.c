@@ -1,16 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_isupper.c                                       :+:      :+:    :+:   */
+/*   ft_strcmp.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aleconte <aleconte@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aleconte <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/17 15:24:35 by aleconte          #+#    #+#             */
-/*   Updated: 2020/11/17 15:24:52 by aleconte         ###   ########.fr       */
+/*   Created: 2020/09/11 11:25:49 by aleconte          #+#    #+#             */
+/*   Updated: 2020/09/11 12:29:52 by aleconte         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int	ft_isupper(int c)
+int		ft_strcmp(char *s1, char *s2)
 {
-	return (c >= 'A' && c <= 'Z');
+	int i;
+
+	i = 0;
+	while (s1[i] && s2[i] && s1[i] == s2[i])
+		i++;
+	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }

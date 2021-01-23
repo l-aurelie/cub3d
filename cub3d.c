@@ -58,17 +58,146 @@ void	ft_set_params(t_d *data)
 	data->cam.turn_dir = 0;
 	data->cam.walk_dir = 0;
 	data->cam.rotate_angle = M_PI * 2;
-	data->cam.move_speed = 10.0;
-	data->cam.rotate_speed = 10 * (M_PI/180);
+	data->cam.move_speed = 2.0;
+	data->cam.rotate_speed = 0.5 * (M_PI/180);
 //======Rays
 	data->ray.fov_angle = 60 * (M_PI/180);
 	data->ray.nb_rays = data->res.width;
-//======color
-//	data->color.ceiling = 0x4b0082;
-//	data->color.floor = 0xbaba9e;
+	data->ray.ray_dist = malloc(sizeof(double) * data->res.width);//TODO protection
 }
 
-char	has_wall(double x, double y, t_d data)
+void    calculate_dist_sprite(t_st *sprite, t_d *data)
+{
+        sprite->dist = sqrt((data->cam.x - sprite->pos.x) * (data->cam.x - sprite->pos.x) + (data->cam.y - sprite->pos.y) * (data->cam.y - sprite->pos.y));
+}
+
+void    sort_sprite_tab(t_d *data)
+{
+    int		i;
+    t_st	tmp;
+
+    i = 0;
+    while (i < data->spri.nb_sprite - 1)
+    {
+        if (data->spri.tab[i].dist < data->spri.tab[i + 1].dist && (i + 1) < data->spri.nb_sprite)
+        {
+            tmp = data->spri.tab[i];
+            data->spri.tab[i] = data->spri.tab[i + 1];
+            data->spri.tab[i + 1] = tmp;
+            i = -1;
+        }
+        i++;
+    }
+}
+
+void	calculate_sprite_angle(t_st *sprite, t_d *data)
+{
+	double	vectx;
+	double	vecty;
+	double	angle_diff;
+
+	vectx  = sprite->pos.x - data->cam.x;  
+	vecty = sprite->pos.y -  data->cam.y; 
+	sprite->angle = atan2(vecty, vectx);
+//	printf("rotate = %f\n", data->cam.rotate_angle);
+//	printf("sprite angle = %f\n", sprite->angle);
+	angle_diff = data->cam.rotate_angle - sprite->angle;
+	angle_diff = normalize_angle(angle_diff);
+	sprite->visible = 0;
+	//printf("diff = %f\n", angle_diff);
+	if (angle_diff < data->ray.fov_angle / 2 || angle_diff > 2 * M_PI - data->ray.fov_angle / 2)
+		sprite->visible = 1;
+}
+
+void	sprite_display(t_d *data, t_st *sprite)
+{
+	//printf("sprite display======\n");
+	double	dist_plane;
+	double	sprite_heigth;
+	int		sprite_begin;
+	int		sprite_end;
+	double	dx;
+	double	dy;
+	double	sprite_angle;
+	int		x_begin;
+	double 	x_curr;
+	double	y_curr;
+	int		x_texture; 
+	int		y_texture;	
+	int		color;
+	int		transparence;
+	double	wall_dist;
+	
+	dist_plane = (data->res.width / 2) / tan(data->ray.fov_angle / 2);//todo fonction pour le calculer une seul fois
+	sprite_heigth = (data->map.sq_size / sprite->dist) * dist_plane;
+	
+	sprite_begin = (data->res.heigth / 2) - (sprite_heigth / 2);
+	sprite_end = sprite_begin + sprite_heigth;
+	if (sprite_begin < 0)
+		sprite_begin = 0;
+	if (sprite_end  > data->res.heigth)
+		sprite_end = data->res.heigth;
+	
+//	printf("sprite heigth = %f\n", sprite_heigth);	
+	//printf("begin = %d, end = %d\n", sprite_begin, sprite_end );
+	dx = data->cam.x - sprite->pos.x;
+	dy = data->cam.y - sprite->pos.y;
+	sprite_angle = atan2(dy, dx) - data->cam.rotate_angle;
+	//printf("sprite angle = %f\n", sprite_angle);
+
+	x_begin = dist_plane * tan(sprite_angle) + (data->res.width / 2.0) - (sprite_heigth / 2);
+//	printf("x_begin = %d", x_begin);
+//========draw
+	
+	transparence = find_text_pixel(data->color.s, 0, 0);
+	x_curr = 0;
+	while (x_begin + x_curr < 0)
+		x_curr++;
+	while (x_curr < sprite_heigth && x_begin + x_curr < data->res.width)
+	{
+		//printf("x_curr = %f\n", x_curr);
+		wall_dist = data->ray.ray_dist[(int)(x_begin	+ x_curr)];
+		if (wall_dist > sprite->dist)
+		{
+			//printf("wall_dist = %f, sprite_dist = %f\n", wall_dist, sprite->dist);
+			x_texture = x_curr * data->color.s.width / sprite_heigth;
+			
+			//printf("(x_texture) %f * %d / %f  = %d\n",x_curr, data->color.s.width, sprite_heigth, x_texture);
+			y_curr = sprite_begin;
+			while (y_curr < sprite_end)
+			{
+				//printf("y_curr = %f \n", y_curr);
+				y_texture = (y_curr + (sprite_heigth / 2.0) - (data->res.heigth / 2.0)) * ((double)data->color.s.heigth / (double)sprite_heigth);
+				//printf("y_texture = %d\n", y_texture);
+				color = find_text_pixel(data->color.s, x_texture, y_texture);
+				//printf("color = %d\n", color);
+				if (color != transparence)
+					my_mlx_pixel_put(data, x_begin + x_curr, y_curr, color);	
+				y_curr++;
+			}
+		}
+		x_curr++;
+	}
+}
+
+void	sprite_init(t_d *data)
+{
+	int i;
+
+	i = 0;
+	while (i < data->spri.nb_sprite)
+	{
+		calculate_dist_sprite(&data->spri.tab[i], data);
+		calculate_sprite_angle(&data->spri.tab[i], data);
+		if (data->spri.tab[i].visible)
+			sprite_display(data, &data->spri.tab[i]);
+		i++;
+	}
+	sort_sprite_tab(data);
+//	print_sprite_tab(data);
+}
+
+char	has_wall(double x, double y, t_d *data)
 {
 	//printf("has_wall_______\n");
 	int grid_index_x;
@@ -76,9 +205,9 @@ char	has_wall(double x, double y, t_d data)
 	
 //	if (x < 0 || x > data.res.width || y < 0 || y > data.res.heigth)
 //		return ('1');
-	grid_index_x = floor(x/data.map.sq_size);
-	grid_index_y = floor(y/data.map.sq_size);
-	return (data.map.grid[grid_index_y][grid_index_x]);
+	grid_index_x = floor(x/data->map.sq_size);
+	grid_index_y = floor(y/data->map.sq_size);
+	return (data->map.grid[grid_index_y][grid_index_x]);
 }
 
 double	normalize_angle(double angle)
@@ -115,7 +244,7 @@ double	calcul_dist(double x1, double x2, double y1, double y2)
 	return(sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 -y1)));
 }
 
-void	calcul_hit_dist(t_d *data)
+void	calcul_hit_dist(t_d *data, int column)
 {
 	data->ray.h_dist = 0;//TODO = supprimer
        	data->ray.v_dist = 0;//TODO = supprimer
@@ -127,33 +256,33 @@ void	calcul_hit_dist(t_d *data)
 	
 	if(data->ray.h_dist == 0)
 	{
-		data->ray.final_dist = data->ray.v_dist;
+		data->ray.ray_dist[column] = data->ray.v_dist;
 		data->ray.hit_x = data->ray.v_hit_x;//sup
 		data->ray.hit_y = data->ray.v_hit_y;//sup
 	}
 	else if (data->ray.v_dist == 0)
 	{
-		data->ray.final_dist = data->ray.h_dist;
+		data->ray.ray_dist[column] = data->ray.h_dist;
 		data->ray.hit_x = data->ray.h_hit_x;//sup
 		data->ray.hit_y = data->ray.h_hit_y;//sup
 	}
 	else if (data->ray.h_dist > data->ray.v_dist)
 	{
-		data->ray.final_dist = data->ray.v_dist;
+		data->ray.ray_dist[column] = data->ray.v_dist;
 		data->ray.hit_x = data->ray.v_hit_x;//sup
 		data->ray.hit_y = data->ray.v_hit_y;//sup
 		data->ray.found_h = 0;
 	}
 	else
 	{
-		data->ray.final_dist = data->ray.h_dist;
+		data->ray.ray_dist[column] = data->ray.h_dist;
 		data->ray.hit_x = data->ray.h_hit_x;//sup
 		data->ray.hit_y = data->ray.h_hit_y;//sup
 		data->ray.found_v = 0;
 	}
 }
 
-void	find_hz_hit(t_d *data, int column_id)
+void	find_hz_hit(t_d *data)
 {
 	double	x_intercept; 
 	double	y_intercept;
@@ -187,7 +316,7 @@ void	find_hz_hit(t_d *data, int column_id)
 		if(data->ray.up)//up
 			y--;
 
-		if(has_wall(next_x, y, *data) == '1' ||has_wall(next_x, y, *data) == ' ')//TODO laisser ' '?
+		if(has_wall(next_x, y, data) == '1' ||has_wall(next_x, y, data) == ' ')//TODO laisser ' '?
 		{
 			data->ray.found_h = 1;
 			data->ray.h_hit_x = next_x;
@@ -202,7 +331,7 @@ void	find_hz_hit(t_d *data, int column_id)
 	}	
 }
 
-void	find_vt_hit(t_d *data, int column_id)
+void	find_vt_hit(t_d *data)
 {
 	double	x_intercept; 
 	double	y_intercept;
@@ -239,7 +368,7 @@ void	find_vt_hit(t_d *data, int column_id)
 		if (data->ray.left)
 			x--;
 
-		if(has_wall(x, next_y, *data) == '1' ||has_wall(x, next_y, *data) == ' ')//TODO laisser ' '?
+		if(has_wall(x, next_y, data) == '1' ||has_wall(x, next_y, data) == ' ')//TODO laisser ' '?
 		{
 			data->ray.found_v = 1;
 			data->ray.v_hit_x = next_x;
@@ -257,8 +386,6 @@ void	find_vt_hit(t_d *data, int column_id)
 int		find_text_pixel(t_t text, int x_texture, int y_texture)
 {
 	char	*color;
-	//printf("x = %d, y = %d\n", x_texture, y_texture);
-	//printf("text.width = %d, text,heigth = %d\n", text.width, text.heigth);
 	if (y_texture < 0)
 		y_texture = 0;
 	if (y_texture > text.heigth)
@@ -268,7 +395,6 @@ int		find_text_pixel(t_t text, int x_texture, int y_texture)
 	if (x_texture > text.width)
 		x_texture = text.width;
 	color = text.imgs + (y_texture * text.size_line + x_texture * text.bpp / 8);
-	//printf("color = %d\n", *(int *)color);
 	return (*(int*)color);
 }
 
@@ -283,6 +409,8 @@ void	disp_wall_text(t_d *data, int col, int w_begin, int w_end, t_t *text, int w
 		x_texture = fmod(data->ray.v_hit_y / data->map.sq_size, 1) * text->width;
 	if(data->ray.found_h)
 		x_texture = fmod(data->ray.h_hit_x / data->map.sq_size, 1) * text->width;
+	if ((data->ray.down && data->ray.found_h)/*south*/ || (data->ray.left && data->ray.found_v)/*west*/)
+        x_texture = 64 - x_texture;	
 	if (w_begin < 0)
 		w_begin = 0;
 	if (w_end > data->res.heigth)
@@ -291,74 +419,61 @@ void	disp_wall_text(t_d *data, int col, int w_begin, int w_end, t_t *text, int w
 	while (y < w_end)
 	{
 		y_texture = (y + (wall_heigth / 2.0) - (data->res.heigth / 2.0)) * ((double)text->heigth / (double)wall_heigth);
-		my_mlx_pixel_put(*data, col, y, find_text_pixel(*text, x_texture, y_texture));
+		my_mlx_pixel_put(data, col, y, find_text_pixel(*text, x_texture, y_texture));
 		y++;
 	}	
 }
 
-void	wall_display(t_d *data, int column_id)
+void	wall_display(t_d *data, int column)
 {
 	double	dist_plane;
 	double	wall_heigth;
-	int		wall_begin; 
+	int		wall_begin;
 	int		wall_end;
 	double	correct_dist;
 
-	correct_dist = data->ray.final_dist * cos(data->ray.ray_angle - data->cam.rotate_angle);
+	correct_dist = data->ray.ray_dist[column] * cos(data->ray.ray_angle - data->cam.rotate_angle);
 	dist_plane = (data->res.width / 2) / tan(data->ray.fov_angle / 2);
 	wall_heigth = (data->map.sq_size / correct_dist) * dist_plane;
 
 	wall_begin = (data->res.heigth / 2) - (wall_heigth / 2);
 	wall_end = wall_begin + wall_heigth;
 
-	disp_vertical_line(*data, column_id, 0, wall_begin, data->color.ceiling);//TODO est ce normal que limage ne se clear pas 
-	disp_vertical_line(*data, column_id, wall_end, data->res.heigth, data->color.floor);
+	disp_vertical_line(data, column, 0, wall_begin, data->color.ceiling);
+	disp_vertical_line(data, column, wall_end, data->res.heigth, data->color.floor);
 //================wall Texture
 	if(data->ray.up && data->ray.found_h)//north
-		disp_wall_text(data, column_id, wall_begin, wall_end, &data->color.no, wall_heigth);
+		disp_wall_text(data, column, wall_begin, wall_end, &data->color.no, wall_heigth);
 	else if(data->ray.down && data->ray.found_h)//south
-		disp_wall_text(data, column_id, wall_begin, wall_end, &data->color.so, wall_heigth);
+		disp_wall_text(data, column, wall_begin, wall_end, &data->color.so, wall_heigth);
 
 	else if(data->ray.left && data->ray.found_v)//west
-		disp_wall_text(data, column_id, wall_begin, wall_end, &data->color.we, wall_heigth);
+		disp_wall_text(data, column, wall_begin, wall_end, &data->color.we, wall_heigth);
 
 	else if(data->ray.right && data->ray.found_v)//east
-		disp_wall_text(data, column_id, wall_begin, wall_end, &data->color.ea, wall_heigth);
-
-//====================================
-//====================================
-//=====WITHOUT TEXTURES
-/* 	//disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall);//TODO est ce normal que certaine hauteur de mur soient hors ecran ? certainement si on est trop proche? 
-	if(data->ray.up && data->ray.found_h)//north
-		disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall_north);
-	else if(data->ray.down && data->ray.found_h)//south
-		disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall_south);
-	else if(data->ray.left && data->ray.found_v)//west
-		disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall_west);
-	else if(data->ray.right && data->ray.found_v)//east
-		disp_vertical_line(*data, column_id, wall_begin, wall_end, data->color.wall_east);*/
+		disp_wall_text(data, column, wall_begin, wall_end, &data->color.ea, wall_heigth);
 }
 
 void	cast_rays(t_d *data)
 {
 	//printf("castray______\n");
-	int column_id;
-	column_id = 0;
+	int column;
+	column = 0;
 	
 	data->ray.ray_angle = data->cam.rotate_angle - (data->ray.fov_angle /2);
-	while (column_id < data->ray.nb_rays)
+	while (column < data->ray.nb_rays)
 	{
 		data->ray.ray_angle += data->ray.fov_angle/data->ray.nb_rays;
 		data->ray.ray_angle = normalize_angle(data->ray.ray_angle);
 		ray_dir(data);	
-		find_hz_hit(data, column_id);
-		find_vt_hit(data, column_id);
-		calcul_hit_dist(data);
+		find_hz_hit(data);
+		find_vt_hit(data);
+		calcul_hit_dist(data, column);
 //3d======		
-		wall_display(data, column_id);
+		wall_display(data, column);
 //2d======
-//		draw_line(data->cam.x, data->cam.y, data->ray.hit_x , data->ray.hit_y, 0x00ff00, *data);
-		column_id++;
+//		draw_line(data->cam.x, data->cam.y, data->ray.hit_x , data->ray.hit_y, 0x00ff00, data);
+		column++;
 	}
 }
 	
@@ -387,26 +502,30 @@ int		ft_loop(t_d *data)
 		data->cam.x += cos(data->cam.rotate_angle) * move_step;
 		data->cam.y += sin(data->cam.rotate_angle) * move_step;
 	}
-	if (has_wall(data->cam.x, data->cam.y, *data) == '1')
+	if (has_wall(data->cam.x, data->cam.y, data) == '1')
 	{
 		data->cam.x = old_x;
 		data->cam.y = old_y;
 	}
 //DISPLAY========
 /*
-	ft_disp_map(data->map, data->ptr, *data);
-	disp_square(data->cam.x, data->cam.y, 0xffff00, *data, 3);
+	ft_disp_map(data->map, data->ptr, data);
+	disp_square(data->cam.x, data->cam.y, 0xffff00, data, 3);
 
 	cast_rays(data);
-	draw_line(data->cam.x, data->cam.y, (data->cam.x + cos(data->cam.rotate_angle) * 30), (data->cam.y + sin(data->cam.rotate_angle) * 30), 0x000000, *data);*/
+	draw_line(data->cam.x, data->cam.y, (data->cam.x + cos(data->cam.rotate_angle) * 30), (data->cam.y + sin(data->cam.rotate_angle) * 30), 0x000000, data);*/
 //========mini map	
 	
 	cast_rays(data);
-	ft_disp_minimap(data->map, data->ptr, *data);
-	disp_square(data->cam.x * 0.2, data->cam.y * 0.2, 0xffff00, *data, 3 * 0.2);	
-	draw_line(data->cam.x * 0.2, data->cam.y * 0.2, data->ray.hit_x * 0.2, data->ray.hit_y * 0.2, 0x00ff00, *data);
-	draw_line(data->cam.x * 0.2, data->cam.y * 0.2, (data->cam.x + cos(data->cam.rotate_angle) * 30) * 0.2, (data->cam.y + sin(data->cam.rotate_angle) * 30) * 0.2, 0x000000, *data);
-
+	ft_disp_minimap(data->map, data->ptr, data);
+	disp_square(data->cam.x * 0.2, data->cam.y * 0.2, 0xffff00, data, 3 * 0.2);	
+	draw_line(data->cam.x * 0.2, data->cam.y * 0.2, data->ray.hit_x * 0.2, data->ray.hit_y * 0.2, 0x00ff00, data);
+	draw_line(data->cam.x * 0.2, data->cam.y * 0.2, (data->cam.x + cos(data->cam.rotate_angle - data->ray.fov_angle / 2) * 80) * 0.2, (data->cam.y + sin(data->cam.rotate_angle - data->ray.fov_angle / 2) * 80) * 0.2, 0x00ff00, data);
+	draw_line(data->cam.x * 0.2, data->cam.y * 0.2, (data->cam.x + cos(data->cam.rotate_angle) * 30) * 0.2, (data->cam.y + sin(data->cam.rotate_angle) * 30) * 0.2, 0x000000, data);
+	
+//	print_tab_double(data->ray.ray_dist, data->ray.nb_rays);
+//==========sprite
+	sprite_init(data);
 	mlx_put_image_to_window(data->ptr.mlx, data->ptr.window, data->ptr.img, 0, 0);
 	mlx_do_sync(data->ptr.mlx);
 	return (0);
@@ -422,8 +541,9 @@ int		main(int argc, char **argv)
 	data.ptr.mlx = mlx_init();
 	parse_map(argv[1], &data);
 	ft_set_params(&data);
-	mlx_hook(data.ptr.window, KEYPRESS, 1L<<0, key_press, (void *)&data.cam);	
+	mlx_hook(data.ptr.window, KEYPRESS, 1L<<0, key_press, (void *)&data.cam);
 	mlx_hook(data.ptr.window, KEYRELEASE, 1L<<1, key_release, (void *)&data.cam);
+//	mlx_hook(data.ptr.window, 33, (1L << 17), mlx_loop_end, data.ptr.mlx);
 	mlx_loop_hook(data.ptr.mlx, ft_loop, &data);
 	mlx_loop(data.ptr.mlx);
 }
