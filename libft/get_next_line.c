@@ -63,6 +63,8 @@ int		ft_read_line(int fd, char **line, char *buff, char *line_result)
 	}
 	if (!(*line = ft_strjoin_line(line_result, buff)))
 		return (-1);
+	if (**line && ret == 0)
+		return (1);
 	if (ret == 0)
 		return (0);
 	return (-1);

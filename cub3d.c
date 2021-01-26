@@ -3,23 +3,25 @@
 
 //TODO = memset data 
 
-int		key_press(int key, t_ca *cam)
+int		key_press(int key, t_d *data)
 {	
-	cam->side_move = 0;
+	data->cam.side_move = 0;
 	if (key == KEY_A || key == KEY_D )
-		cam->side_move = 1;
+		data->cam.side_move = 1;
 	if (key == KEY_W)//devant
-		cam->walk_dir = 1; 
+		data->cam.walk_dir = 1; 
 	else if (key == KEY_S)//bas
-		cam->walk_dir = -1;
+		data->cam.walk_dir = -1;
 	else if (key == KEY_D)//droite 
-		cam->walk_dir = 1; 
+		data->cam.walk_dir = 1; 
 	else if (key == KEY_A)//gauche
-		cam->walk_dir = -1;
+		data->cam.walk_dir = -1;
 	else if (key == KEY_LEFT)//rot_gauche
-		cam->turn_dir = -1;
+		data->cam.turn_dir = -1;
 	else if (key == KEY_RIGHT)//rot_dte
-		cam->turn_dir = 1;
+		data->cam.turn_dir = 1;
+	else if (key == KEY_ESC)
+		ft_exit_game(data);	
 	return (0);
 }
 
@@ -42,9 +44,6 @@ int		key_release(int key, t_ca *cam)
 
 void	ft_set_params(t_d *data)
 {
-//=======res
-	data->res.width = data->map.sq_size * data->map.width;
-	data->res.heigth = data->map.sq_size * data->map.heigth;
 //=======ptr
 	if (!(data->ptr.window = mlx_new_window(data->ptr.mlx, data->res.width, data->res.heigth, "cube3d")))
 		exit(EXIT_FAILURE);
@@ -52,14 +51,10 @@ void	ft_set_params(t_d *data)
 	data->ptr.img = mlx_new_image(data->ptr.mlx, data->res.width, data->res.heigth);
 	data->ptr.imgs = mlx_get_data_addr(data->ptr.img, &data->color.bits_per_pixel, &data->res.size_line, &data->color.endian);
 //======player
-	data->cam.x = 80;
-	data->cam.y = 260;
-	data->cam.radius = 3;
 	data->cam.turn_dir = 0;
 	data->cam.walk_dir = 0;
-	data->cam.rotate_angle = M_PI * 2;
-	data->cam.move_speed = 2.0;
-	data->cam.rotate_speed = 0.5 * (M_PI/180);
+	data->cam.move_speed = 4.0;
+	data->cam.rotate_speed = 4.0 * (M_PI/180);
 //======Rays
 	data->ray.fov_angle = 60 * (M_PI/180);
 	data->ray.nb_rays = data->res.width;
@@ -100,9 +95,12 @@ void	calculate_sprite_angle(t_st *sprite, t_d *data)
 	vecty = sprite->pos.y -  data->cam.y; 
 	sprite->angle = atan2(vecty, vectx);
 //	printf("rotate = %f\n", data->cam.rotate_angle);
-//	printf("sprite angle = %f\n", sprite->angle);
+	printf("sprite angle = %f\n", sprite->angle);
 	angle_diff = data->cam.rotate_angle - sprite->angle;
+	printf("==============\n\n");
+	printf("diff_angle = %f\n", angle_diff);
 	angle_diff = normalize_angle(angle_diff);
+	printf("norma diff_angle = %f\n", angle_diff);
 	sprite->visible = 0;
 	//printf("diff = %f\n", angle_diff);
 	if (angle_diff < data->ray.fov_angle / 2 || angle_diff > 2 * M_PI - data->ray.fov_angle / 2)
@@ -143,7 +141,7 @@ void	sprite_display(t_d *data, t_st *sprite)
 	dx = data->cam.x - sprite->pos.x;
 	dy = data->cam.y - sprite->pos.y;
 	sprite_angle = atan2(dy, dx) - data->cam.rotate_angle;
-	//printf("sprite angle = %f\n", sprite_angle);
+	printf("======sprite angle = %f\n", sprite_angle);
 
 	x_begin = dist_plane * tan(sprite_angle) + (data->res.width / 2.0) - (sprite_heigth / 2);
 //	printf("x_begin = %d", x_begin);
@@ -203,10 +201,14 @@ char	has_wall(double x, double y, t_d *data)
 	int grid_index_x;
 	int grid_index_y;
 	
-//	if (x < 0 || x > data.res.width || y < 0 || y > data.res.heigth)
-//		return ('1');
+
+
 	grid_index_x = floor(x/data->map.sq_size);
 	grid_index_y = floor(y/data->map.sq_size);
+//	if (grid_index_x < 0 || grid_index_x >= data->map.width || grid_index_y < 0 || grid_index_y >= data->map.heigth)
+//		return ('1');
+//	printf("grid_index_x = %d, grid_index_y = %d\n", grid_index_x, grid_index_y);
+//	printf("width = %d, heigth = %d\n", data->map.width, data->map.heigth);
 	return (data->map.grid[grid_index_y][grid_index_x]);
 }
 
@@ -310,7 +312,7 @@ void	find_hz_hit(t_d *data)
 		xstep *= -1;
 	next_x = x_intercept;
 	next_y = y_intercept;
-	while (next_x >= 0 && next_x <= data->res.width && next_y >= 0 && next_y <= data->res.heigth)
+	while (next_x >= 0 && next_x < data->map.sq_size * data->map.width && next_y >= 0 && next_y <  data->map.sq_size * data->map.heigth)
 	{
 		y = next_y;
 		if(data->ray.up)//up
@@ -362,12 +364,14 @@ void	find_vt_hit(t_d *data)
 //=======next
 	next_x = x_intercept;
 	next_y = y_intercept;
-	while (next_x >= 0 && next_x <= data->res.width && next_y >= 0 && next_y <= data->res.heigth)
+	while (next_x >= 0 && next_x < data->map.sq_size * data->map.width && next_y >= 0 && next_y <  data->map.sq_size * data->map.heigth)
 	{
 		x = next_x;
 		if (data->ray.left)
 			x--;
-
+		
+		//printf("next_x = %f, next_y = %f\n", next_x, next_y);
+		//printf("width = %d, heigth = %d\n", data->res.width, data->res.heigth);
 		if(has_wall(x, next_y, data) == '1' ||has_wall(x, next_y, data) == ' ')//TODO laisser ' '?
 		{
 			data->ray.found_v = 1;
@@ -520,7 +524,6 @@ int		ft_loop(t_d *data)
 	ft_disp_minimap(data->map, data->ptr, data);
 	disp_square(data->cam.x * 0.2, data->cam.y * 0.2, 0xffff00, data, 3 * 0.2);	
 	draw_line(data->cam.x * 0.2, data->cam.y * 0.2, data->ray.hit_x * 0.2, data->ray.hit_y * 0.2, 0x00ff00, data);
-	draw_line(data->cam.x * 0.2, data->cam.y * 0.2, (data->cam.x + cos(data->cam.rotate_angle - data->ray.fov_angle / 2) * 80) * 0.2, (data->cam.y + sin(data->cam.rotate_angle - data->ray.fov_angle / 2) * 80) * 0.2, 0x00ff00, data);
 	draw_line(data->cam.x * 0.2, data->cam.y * 0.2, (data->cam.x + cos(data->cam.rotate_angle) * 30) * 0.2, (data->cam.y + sin(data->cam.rotate_angle) * 30) * 0.2, 0x000000, data);
 	
 //	print_tab_double(data->ray.ray_dist, data->ray.nb_rays);
@@ -531,19 +534,52 @@ int		ft_loop(t_d *data)
 	return (0);
 }
 
+void	free_mlx(t_d *data)
+{
+	if (data->ptr.img)
+		mlx_destroy_image(data->ptr.mlx, data->ptr.img);
+	if (data->color.no.img)
+		mlx_destroy_image(data->ptr.mlx, data->color.no.img);
+	if (data->color.so.img)
+		mlx_destroy_image(data->ptr.mlx, data->color.so.img);
+	if (data->color.ea.img)
+		mlx_destroy_image(data->ptr.mlx, data->color.ea.img);	
+	if (data->color.we.img)
+		mlx_destroy_image(data->ptr.mlx, data->color.we.img);	
+	if (data->color.s.img)
+		mlx_destroy_image(data->ptr.mlx, data->color.s.img);
+	//mlx_do_key_autorepeaton(params->mlx_ptr);
+	//mlx_do_sync(params->mlx_ptr);
+	if (data->ptr.window)
+		mlx_destroy_window(data->ptr.mlx, data->ptr.window);
+}
+
+//void	free_struct(t_d *data)
+//{
+
+//}
+
+int	ft_exit_game(t_d *data)
+{
+	//free_struct(data);
+//	free_mlx(data);
+	exit(EXIT_FAILURE);
+	return (0);
+}
+
 int		main(int argc, char **argv)
 {
 	t_d		data;
 
-	int		pos;
-	int		*img_s;
-
+	//int		pos;
+	//int		*img_s;
+	ft_memset(&data, 0, sizeof data);
 	data.ptr.mlx = mlx_init();
-	parse_map(argv[1], &data);
+	parse_cub(argv[1], &data);
 	ft_set_params(&data);
-	mlx_hook(data.ptr.window, KEYPRESS, 1L<<0, key_press, (void *)&data.cam);
+	mlx_hook(data.ptr.window, KEYPRESS, 1L<<0, key_press, (void *)&data);
 	mlx_hook(data.ptr.window, KEYRELEASE, 1L<<1, key_release, (void *)&data.cam);
-//	mlx_hook(data.ptr.window, 33, (1L << 17), mlx_loop_end, data.ptr.mlx);
+	mlx_hook(data.ptr.window, 33, (1L << 17), ft_exit_game, data.ptr.mlx);
 	mlx_loop_hook(data.ptr.mlx, ft_loop, &data);
 	mlx_loop(data.ptr.mlx);
 }

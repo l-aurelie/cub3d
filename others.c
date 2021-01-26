@@ -60,7 +60,10 @@ void	disp_square(int x, int y, int color, t_d *data, int width)
 	{
 		i = x + width;
 		while (i >= x)
-		{	
+		{
+			if (j == y || /*j == y + width ||*/ i == x /*|| i == x + width*/)
+				my_mlx_pixel_put(data, i, j, 0xd3d3d3);
+			else
 				my_mlx_pixel_put(data, i, j, color);
 			i--;
 		}
@@ -107,9 +110,12 @@ void	ft_disp_minimap(t_m map, t_p ptr, t_d *data)
 			tileY = j * map.sq_size;
 
 			if (map.grid[j][i] == '1')
+				disp_square(0.2 * tileX, 0.2 * tileY, 0x000000, data, 0.2 * map.sq_size);
+			else if (map.grid[j][i] == '0')
 				disp_square(0.2 * tileX, 0.2 * tileY, 0xffffff, data, 0.2 * map.sq_size);
-			else
-				disp_square(0.2 * tileX, 0.2 * tileY, 0xff0000, data, 0.2 * map.sq_size);
+			else if (map.grid[j][i] == '2')
+				disp_square(0.2 * tileX, 0.2 * tileY, 0xa9a9a9, data, 0.2 * map.sq_size);
+
 			i++;
 		}
 		j++;

@@ -62,6 +62,7 @@ typedef struct	s_ca
 {
 	double	x;
 	double	y;
+	char	dir;
 	int		radius;
 	int		turn_dir;
 	int		walk_dir;
@@ -152,8 +153,7 @@ void	disp_square(int x, int y, int color, t_d *data, int width);
 void	ft_set_params(t_d *data);
 void	disp_vertical_line(t_d *data, int x, int y1, int y2, int color);
 void	draw_line(int x0, int y0, int x1, int y1, int color, t_d *data);
-void	parse_map(char *map, t_d *data);
-void	ft_set_map(t_m *map);
+void	parse_cub(char *map, t_d *data);
 void	my_mlx_pixel_put(t_d *data, int x, int y, int color);
 void	print_map(t_m map);
 void	ft_disp_minimap(t_m map, t_p ptr, t_d *data);
@@ -169,4 +169,9 @@ int		ft_abs(int x);
 double	ft_abs_d(double x);
 double  normalize_angle(double angle);
 int		find_text_pixel(t_t text, int x_texture, int y_texture);
+void	init_player(t_d *data);
+void	ft_set_map(t_m *map);
+void	error(char *sterror);
+void	parse_map(t_d *data);
+int		ft_exit_game(t_d *data);  
 #endif
