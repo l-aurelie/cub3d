@@ -38,6 +38,6 @@ char	*ft_substr(char *s, int start, int len, int to_free)
 	}
 	sub[i] = 0;
 	if (to_free == 1)
-		free(s);
+		ft_free((void **)&s);
 	return (sub);
 }

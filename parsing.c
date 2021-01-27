@@ -102,24 +102,23 @@ void	get_text_tab(char *texture, t_d *data, t_t *struc)
 
 void	parse_text(t_d *data, char *line)
 {
-	char **split; 
 	
-	split =	ft_split(line , ' ');
-	if (count_strtab_elem(split) != 2)
+	data->pars.split =	ft_split(line , ' ');
+	if (count_strtab_elem(data->pars.split) != 2)
 		error("texture_name_error\n", data);
-	if (ft_strcmp(split[0], "NO") == 0)
-		get_text_tab(split[1], data, &(data->color.no));
-	else if (ft_strcmp(split[0], "SO") == 0)
-		get_text_tab(split[1], data, &(data->color.so));
-	else if (ft_strcmp(split[0], "WE") == 0)
-		get_text_tab(split[1], data, &(data->color.we));
-	else if (ft_strcmp(split[0], "EA") == 0)
-		get_text_tab(split[1], data, &(data->color.ea));
-	else if (ft_strcmp(split[0], "S") == 0)
-		get_text_tab(split[1], data, &(data->color.s));
+	if (ft_strcmp(data->pars.split[0], "NO") == 0)
+		get_text_tab(data->pars.split[1], data, &(data->color.no));
+	else if (ft_strcmp(data->pars.split[0], "SO") == 0)
+		get_text_tab(data->pars.split[1], data, &(data->color.so));
+	else if (ft_strcmp(data->pars.split[0], "WE") == 0)
+		get_text_tab(data->pars.split[1], data, &(data->color.we));
+	else if (ft_strcmp(data->pars.split[0], "EA") == 0)
+		get_text_tab(data->pars.split[1], data, &(data->color.ea));
+	else if (ft_strcmp(data->pars.split[0], "S") == 0)
+		get_text_tab(data->pars.split[1], data, &(data->color.s));
 	else
 		error("texture name error\n", data);
-	free_split(&split);
+	free_split(&data->pars.split);
 }
 
 /*void	print_tab(int *tab, int size)
@@ -134,45 +133,44 @@ void	parse_text(t_d *data, char *line)
 		printf("\n");
 }*/
 
-int		*get_color_tab(t_d *data, char **split, int **rgb)
+int		*get_color_tab(t_d *data, char ***split, int **rgb)
 {
 	int i;
 
 	i = 0;
-	split[0] = ft_substr(split[0], 1, ft_strlen(split[0]) -1, 1);
+	(*split)[0] = ft_substr((*split[0]), 1, ft_strlen((*split[0])) -1, 1);
 	*rgb = malloc(sizeof(int) * 3);
-	while(split[i])
+	while((*split)[i])
 	{
-		split[i] = ft_strtrim(split[i], " ", 1);
-		if (!split[i][0])
+		(*split)[i] = ft_strtrim((*split)[i], " ", 1);
+		if (!(*split)[i][0])
 			error("color must be tree element separated by comas\n", data);
-		if (!ft_str_is_numeric(split[i]))
+		if (!ft_str_is_numeric((*split)[i]))
 			error("color must contain only digit separated by comas\n", data);
-		(*rgb)[i] = ft_atoi(split[i]);
+		(*rgb)[i] = ft_atoi((*split)[i]);
 		if(!((*rgb)[i] >= 0 && (*rgb)[i] <= 255))
 			error("rgb must be between 0 and 255\n", data);
 		i++;
 	}
-	free_split(&split);
+	free_split(split);
 	return (*rgb);
 }
 void	parse_color(t_d *data, char *line)
 {
-	char **split;
 	int *rgb;
 	
-	split = ft_split(line, ',');
-	if (count_strtab_elem(split) != 3)
+	data->pars.split = ft_split(line, ',');
+	if (count_strtab_elem(data->pars.split) != 3)
 		error("color rgb wrong number of element\n", data);
 
-	if (ft_strncmp(split[0], "C ", 2) == 0)
+	if (ft_strncmp(data->pars.split[0], "C ", 2) == 0)
 	{
-		rgb = get_color_tab(data,split, &rgb);
+		rgb = get_color_tab(data,&data->pars.split, &rgb);
 		data->color.ceiling = (rgb[0] << 16) + (rgb[1] << 8) + rgb[2];
 	}
-	else if (ft_strncmp(split[0], "F ", 2) == 0)
+	else if (ft_strncmp(data->pars.split[0], "F ", 2) == 0)
 	{
-		rgb = get_color_tab(data, split, &rgb);
+		rgb = get_color_tab(data, &data->pars.split, &rgb);
 		data->color.floor = (rgb[0] << 16) + (rgb[1] << 8) + rgb[2];
 	}
 	else
@@ -182,20 +180,19 @@ void	parse_color(t_d *data, char *line)
 
 void	parse_res(t_d *data, char *line)
 {
-	char **split; //todo free split 
 	
-	split =	ft_split(line , ' ');
-	if (count_strtab_elem(split) != 3)
+	data->pars.split =	ft_split(line , ' ');
+	if (count_strtab_elem(data->pars.split) != 3)
 		error("resolution wrong number of elements\n", data);
-	if (ft_strcmp(split[0], "R"))
+	if (ft_strcmp(data->pars.split[0], "R"))
 		error("wrong element in resolution\n", data);
-	if (!(ft_str_is_numeric(split[1]) && ft_str_is_numeric(split[2])))
+	if (!(ft_str_is_numeric(data->pars.split[1]) && ft_str_is_numeric(data->pars.split[2])))
 		error("resolution must be numeric\n", data);
-	data->res.width = ft_atoi(split[1]);
-	data->res.heigth = ft_atoi(split[2]);
+	data->res.width = ft_atoi(data->pars.split[1]);
+	data->res.heigth = ft_atoi(data->pars.split[2]);
 	if(!(data->res.width > 0 && data->res.heigth > 0))
 		error("resolution can't be negative or 0\n", data);
-	free_split(&split);
+	free_split(&data->pars.split);
 }
 
 void	error_index(t_d *data, char *line, int *all_elem, int index)
@@ -216,51 +213,49 @@ void	error_index(t_d *data, char *line, int *all_elem, int index)
 void	parse_cub(char *map, t_d *data)
 {
 	int		fd;
-	char	*line;
 	char	*map_elem;
 	int 	index;
 	int		ret;
 	int		all_elem[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	static void (*f[])() = {&parse_res, &parse_text, &parse_text, &parse_text, &parse_text, &parse_color, &parse_color};	
 	
-	line = NULL;
 	map_elem = "RNSWEFC";
 	fd = open(map, O_RDONLY);
 	data->map.s_map = ft_strdup("\0");
 	ret = 1;
 	while (ret > 0 && !is_full_tab(all_elem, 8))
 	{
-		ret = get_next_line(fd, &line);
-		line = ft_strtrim(line, " ", 1);
-		if (line[0])
+		ret = get_next_line(fd, &data->pars.line);
+		data->pars.line = ft_strtrim(data->pars.line, " ", 1);
+		if (data->pars.line[0])
 		{
-			if(line[0] == 'S' && line[1] == 'O')
+			if(data->pars.line[0] == 'S' && data->pars.line[1] == 'O')
 				all_elem[7] += 1;
-			index = ft_chr_pos(map_elem, line[0]);
+			index = ft_chr_pos(map_elem, data->pars.line[0]);
 			if (index == -1)
-				error_index(data, line, all_elem, index);
+				error_index(data, data->pars.line, all_elem, index);
 		
-			(*f[index])(data, line);
-			if(!(line[0] == 'S' && line[1] == 'O'))
+			(*f[index])(data, data->pars.line);
+			if(!(data->pars.line[0] == 'S' && data->pars.line[1] == 'O'))
 				all_elem[index] += 1;
 		}
-		ft_free((void **)&line);
+		ft_free((void **)&data->pars.line);
 	}
 
-	line = ft_strdup("\0");
-	while (ret > 0 && ft_strlen(line) == 0)
+	data->pars.line = ft_strdup("\0");
+	while (ret > 0 && ft_strlen(data->pars.line) == 0)
 	{
-		ft_free((void **)&line);
-		ret = get_next_line(fd, &line);
+		ft_free((void **)&data->pars.line);
+		ret = get_next_line(fd, &data->pars.line);
 	}
 	while (ret > 0)
 	{
-		if (ft_strlen(line) == 0)
+		if (ft_strlen(data->pars.line) == 0)
 			error("empty line in map\n", data);
-		data->map.s_map = ft_strjoin(data->map.s_map, line, 1, 1);
+		data->map.s_map = ft_strjoin(data->map.s_map, data->pars.line, 1, 1);
 		data->map.s_map = ft_strjoin(data->map.s_map, ",", 1, 0);
-		ret = get_next_line(fd, &line);
+		ret = get_next_line(fd, &data->pars.line);
 	}
-	ft_free((void **)&line);
+	ft_free((void **)&data->pars.line);
 	parse_map(data);
 }

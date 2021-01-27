@@ -568,6 +568,10 @@ void	free_struct(t_d *data)
 		free_matrix(&data->map.grid, data->map.heigth);
 	if (data->spri.tab)
 		ft_free((void **)&data->spri.tab);
+	if (data->pars.line)
+		ft_free((void **)&data->pars.line);
+	if (data->pars.split)
+		free_split(&data->pars.split);
 }
 
 int	ft_exit_game(t_d *data)
@@ -582,8 +586,6 @@ int		main(int argc, char **argv)
 {
 	t_d		data;
 
-	//int		pos;
-	//int		*img_s;
 	ft_memset(&data, 0, sizeof data);
 	data.ptr.mlx = mlx_init();
 	parse_cub(argv[1], &data);

@@ -185,4 +185,5 @@ int		ft_free(void **ptr);
 void	free_matrix(int ***matrix, int heigth);
 void	free_mlx(t_d *data);
 void	free_struct(t_d *data);
+void	free_split(char ***split);
 #endif

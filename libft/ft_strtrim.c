@@ -31,7 +31,7 @@ char	*ft_strtrim(char *s1, char const *set, int to_free)
 	if (to_free)
 	{
 		trimmed = ft_substr(s1, 0, len + 1, 0);
-		free(need_free);
+		ft_free((void **)&need_free);
 	}
 	else	
 		trimmed = ft_substr(s1, 0, len + 1, 0);

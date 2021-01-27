@@ -73,6 +73,7 @@ int		ft_strcmp(char *s1, char *s2);
 
 int		ft_chr_pos(char *str, char c);
 int		is_charset(char c, char *charset);
+int		ft_free(void **ptr);
 
 int		ft_check_buffer_nl(char *buffer);
 char	*ft_strjoin_line(char *s1, char const *s2);
