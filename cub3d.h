@@ -32,6 +32,12 @@ typedef struct	s_dpos
 	double	y;
 }				t_dpos;
 
+typedef struct	s_pa
+{
+	char	**split;
+	char	*line;
+}				t_pa;
+
 typedef struct	s_ra
 {
 	double	fov_angle;
@@ -147,6 +153,7 @@ typedef struct	s_d
 	t_m		map;
 	t_ra	ray;
 	t_sp	spri;
+	t_pa	pars;
 }				t_d;
 
 void	disp_square(int x, int y, int color, t_d *data, int width);
@@ -158,7 +165,7 @@ void	my_mlx_pixel_put(t_d *data, int x, int y, int color);
 void	print_map(t_m map);
 void	ft_disp_minimap(t_m map, t_p ptr, t_d *data);
 void	ft_disp_map(t_m map, t_p ptr, t_d *data);
-void	error_index(char *line, int *all_elem, int index);
+void	error_index(t_d *data, char *line, int *all_elem, int index);
 void	calculate_dist_sprite(t_st *sprite, t_d *data);
 void	calculate_angle_sprite(t_st *sprite,t_d *data);
 void	sort_sprite_tab(t_d *data);
@@ -170,8 +177,12 @@ double	ft_abs_d(double x);
 double  normalize_angle(double angle);
 int		find_text_pixel(t_t text, int x_texture, int y_texture);
 void	init_player(t_d *data);
-void	ft_set_map(t_m *map);
-void	error(char *sterror);
+void	ft_set_map(t_d *data, t_m *map);
+void	error(char *sterror, t_d *data);
 void	parse_map(t_d *data);
 int		ft_exit_game(t_d *data);  
+int		ft_free(void **ptr);
+void	free_matrix(int ***matrix, int heigth);
+void	free_mlx(t_d *data);
+void	free_struct(t_d *data);
 #endif

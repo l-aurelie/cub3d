@@ -95,12 +95,12 @@ void	calculate_sprite_angle(t_st *sprite, t_d *data)
 	vecty = sprite->pos.y -  data->cam.y; 
 	sprite->angle = atan2(vecty, vectx);
 //	printf("rotate = %f\n", data->cam.rotate_angle);
-	printf("sprite angle = %f\n", sprite->angle);
+//	printf("sprite angle = %f\n", sprite->angle);
 	angle_diff = data->cam.rotate_angle - sprite->angle;
-	printf("==============\n\n");
-	printf("diff_angle = %f\n", angle_diff);
+//	printf("==============\n\n");
+//	printf("diff_angle = %f\n", angle_diff);
 	angle_diff = normalize_angle(angle_diff);
-	printf("norma diff_angle = %f\n", angle_diff);
+//	printf("norma diff_angle = %f\n", angle_diff);
 	sprite->visible = 0;
 	//printf("diff = %f\n", angle_diff);
 	if (angle_diff < data->ray.fov_angle / 2 || angle_diff > 2 * M_PI - data->ray.fov_angle / 2)
@@ -141,7 +141,7 @@ void	sprite_display(t_d *data, t_st *sprite)
 	dx = data->cam.x - sprite->pos.x;
 	dy = data->cam.y - sprite->pos.y;
 	sprite_angle = atan2(dy, dx) - data->cam.rotate_angle;
-	printf("======sprite angle = %f\n", sprite_angle);
+//	printf("======sprite angle = %f\n", sprite_angle);
 
 	x_begin = dist_plane * tan(sprite_angle) + (data->res.width / 2.0) - (sprite_heigth / 2);
 //	printf("x_begin = %d", x_begin);
@@ -468,7 +468,8 @@ void	cast_rays(t_d *data)
 	while (column < data->ray.nb_rays)
 	{
 		data->ray.ray_angle += data->ray.fov_angle/data->ray.nb_rays;
-		data->ray.ray_angle = normalize_angle(data->ray.ray_angle);
+//		data->ray.ray_angle += data->cam.rotate_angle + atan(column - data->ray.nb_rays) / ;
+data->ray.ray_angle = normalize_angle(data->ray.ray_angle);
 		ray_dir(data);	
 		find_hz_hit(data);
 		find_vt_hit(data);
@@ -552,18 +553,28 @@ void	free_mlx(t_d *data)
 	//mlx_do_sync(params->mlx_ptr);
 	if (data->ptr.window)
 		mlx_destroy_window(data->ptr.mlx, data->ptr.window);
+		mlx_destroy_display(data->ptr.mlx);
+	if (data->ptr.mlx)
+		ft_free((void **)&data->ptr.mlx);
 }
 
-//void	free_struct(t_d *data)
-//{
-
-//}
+void	free_struct(t_d *data)
+{
+	if (data->ray.ray_dist)
+		ft_free((void **)&data->ray.ray_dist);
+	if (data->map.s_map)
+		ft_free((void **)&data->map.s_map);
+	if (data->map.grid)
+		free_matrix(&data->map.grid, data->map.heigth);
+	if (data->spri.tab)
+		ft_free((void **)&data->spri.tab);
+}
 
 int	ft_exit_game(t_d *data)
 {
-	//free_struct(data);
-//	free_mlx(data);
-	exit(EXIT_FAILURE);
+	free_struct(data);
+	free_mlx(data);
+	exit(EXIT_SUCCESS);
 	return (0);
 }
 
@@ -579,7 +590,8 @@ int		main(int argc, char **argv)
 	ft_set_params(&data);
 	mlx_hook(data.ptr.window, KEYPRESS, 1L<<0, key_press, (void *)&data);
 	mlx_hook(data.ptr.window, KEYRELEASE, 1L<<1, key_release, (void *)&data.cam);
-	mlx_hook(data.ptr.window, 33, (1L << 17), ft_exit_game, data.ptr.mlx);
+	mlx_hook(data.ptr.window, 33, (1L << 17), ft_exit_game, (void *)&data);
 	mlx_loop_hook(data.ptr.mlx, ft_loop, &data);
 	mlx_loop(data.ptr.mlx);
+	return(0);
 }

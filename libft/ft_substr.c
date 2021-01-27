@@ -12,7 +12,7 @@
 
 #include "libft.h"
 
-char	*ft_substr(char const *s, int start, int len)
+char	*ft_substr(char *s, int start, int len, int to_free)
 {
 	char	*sub;
 	int		size;
@@ -32,10 +32,12 @@ char	*ft_substr(char const *s, int start, int len)
 		return (NULL);
 	while (i < size)
 	{
-		sub[i] = s[start];
-		i++;
-		start++;
+		sub[i++] = s[start++];
+	//	i++;
+	//	start++;
 	}
 	sub[i] = 0;
+	if (to_free == 1)
+		free(s);
 	return (sub);
 }
