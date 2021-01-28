@@ -584,10 +584,74 @@ int	ft_exit_game(t_d *data)
 	return (0);
 }
 
+int		check_error_arguments(int argc, char **argv)
+{
+	int fd;
+	int error_state;
+
+	error_state = 0;
+	if (argc < 2 || argc > 3)
+		error_state = 1;
+	else
+	{
+		if (ft_strcmp(argv[1] + ft_strlen(argv[1]) - 4, ".cub"))
+			error_state = 1;
+		fd = open(argv[1], O_RDONLY);
+		if (fd < 0)
+			error_state = 1;
+		close(fd);
+		if (argc == 3 && ft_strcmp(argv[2], "--save") != 0)
+			error_state = 1;
+	}
+	if (error_state)
+	{
+		printf("please enter program name followed by [map_description].cub. You can use option --save if needed");
+		exit(EXIT_FAILURE);	
+	}
+	return (error_state);
+}
+
 int		main(int argc, char **argv)
 {
 	t_d		data;
 
+	check_error_arguments(argc, argv);
+	ft_memset(&data, 0, sizeof data);
+	data.ptr.mlx = mlx_init();
+	parse_cub(argv[1], &data);
+	ft_set_params(&data);
+	if (argc == 2)
+	{
+	/*	game.mlx.id = mlx_init();
+		global_parse(argv[1], &game);
+		global_img(&game);
+		global_win(&game);
+		global_event(&game);
+		mlx_loop(game.mlx.id);*/
+		mlx_hook(data.ptr.window, KEYPRESS, 1L<<0, key_press, (void *)&data);
+		mlx_hook(data.ptr.window, KEYRELEASE, 1L<<1, key_release, (void *)&data.cam);
+		mlx_hook(data.ptr.window, 33, (1L << 17), ft_exit_game, (void *)&data);
+		mlx_loop_hook(data.ptr.mlx, ft_loop, &data);
+		mlx_loop(data.ptr.mlx);
+
+	}
+	else if (argc == 3)
+	{
+		/*game.mlx.id = mlx_init();
+		global_parse(argv[1], &game);
+		global_img(&game);
+		ft_create_bmp(&game);
+		free_game(&game);
+		exit(EXIT_SUCCESS);*/
+		data.pars.save = 1;
+		ft_create_bmp(&data);
+		ft_exit_game(&data);
+	}
+	return (0);
+}
+/*	t_d		data;
+
+	check_error_arguments(argc, argv);
 	ft_memset(&data, 0, sizeof data);
 	data.ptr.mlx = mlx_init();
 	parse_cub(argv[1], &data);
@@ -598,4 +662,4 @@ int		main(int argc, char **argv)
 	mlx_loop_hook(data.ptr.mlx, ft_loop, &data);
 	mlx_loop(data.ptr.mlx);
 	return(0);
-}
+*/

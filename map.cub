@@ -1,10 +1,11 @@
-    R 1000   200
+    
+R 1000   200
     NO ./textures/colorstone.xpm 
 SO ./textures/brick.xpm
 WE ./textures/moss.xpm
 EA ./textures/wood.xpm
 S ./textures/tree.xpm
-F    214 ,  250  ,  0v
+F    214 ,  250  ,  0
 C     250, 20  ,0    
 
 

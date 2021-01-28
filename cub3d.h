@@ -3,6 +3,7 @@
 #include <math.h>
 #include "mlx.h"
 #include "libft.h"
+#include "bmp.h"
 #include <stdlib.h>
 #include <fcntl.h>
 
@@ -34,6 +35,7 @@ typedef struct	s_dpos
 
 typedef struct	s_pa
 {
+	int		save;
 	char	**split;
 	char	*line;
 	int		*rgb;
@@ -187,4 +189,5 @@ void	free_matrix(int ***matrix, int heigth);
 void	free_mlx(t_d *data);
 void	free_struct(t_d *data);
 void	free_split(char ***split);
+void	ft_create_bmp(t_d *data);
 #endif
