@@ -4,13 +4,13 @@ SO ./textures/brick.xpm
 WE ./textures/moss.xpm
 EA ./textures/wood.xpm
 S ./textures/tree.xpm
-F    b214 ,  250  ,  0
+F    214 ,  250  ,  0v
 C     250, 20  ,0    
 
 
  11111111111
 100020000121
-100000000001
+100000000001  
 1000000N0001
 100000000001
 100000000001

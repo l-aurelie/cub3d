@@ -572,6 +572,8 @@ void	free_struct(t_d *data)
 		ft_free((void **)&data->pars.line);
 	if (data->pars.split)
 		free_split(&data->pars.split);
+	if 	(data->pars.rgb)
+		ft_free((void **)&data->pars.rgb);
 }
 
 int	ft_exit_game(t_d *data)

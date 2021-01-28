@@ -157,25 +157,23 @@ int		*get_color_tab(t_d *data, char ***split, int **rgb)
 }
 void	parse_color(t_d *data, char *line)
 {
-	int *rgb;
-	
 	data->pars.split = ft_split(line, ',');
 	if (count_strtab_elem(data->pars.split) != 3)
 		error("color rgb wrong number of element\n", data);
 
 	if (ft_strncmp(data->pars.split[0], "C ", 2) == 0)
 	{
-		rgb = get_color_tab(data,&data->pars.split, &rgb);
-		data->color.ceiling = (rgb[0] << 16) + (rgb[1] << 8) + rgb[2];
+		data->pars.rgb = get_color_tab(data,&data->pars.split, &data->pars.rgb);
+		data->color.ceiling = (data->pars.rgb[0] << 16) + (data->pars.rgb[1] << 8) + data->pars.rgb[2];
 	}
 	else if (ft_strncmp(data->pars.split[0], "F ", 2) == 0)
 	{
-		rgb = get_color_tab(data, &data->pars.split, &rgb);
-		data->color.floor = (rgb[0] << 16) + (rgb[1] << 8) + rgb[2];
+		data->pars.rgb = get_color_tab(data, &data->pars.split, &data->pars.rgb);
+		data->color.floor = (data->pars.rgb[0] << 16) + (data->pars.rgb[1] << 8) + data->pars.rgb[2];
 	}
 	else
 		error("wrong element in color\n", data);
-	ft_free((void **)&rgb);
+	ft_free((void **)&data->pars.rgb);
 }
 
 void	parse_res(t_d *data, char *line)

@@ -36,6 +36,7 @@ typedef struct	s_pa
 {
 	char	**split;
 	char	*line;
+	int		*rgb;
 }				t_pa;
 
 typedef struct	s_ra
