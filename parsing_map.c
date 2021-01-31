@@ -23,7 +23,7 @@ void	ft_size_map(char *str, t_m *map)
 	}
 }
 
-void	ft_set_map(t_d *data, t_m *map)
+void	ft_set_map(t_data *d, t_m *map)
 {
 	int **grid; 
 	int i; 
@@ -64,13 +64,13 @@ void	ft_set_map(t_d *data, t_m *map)
 //print_map(*map); 
 }
 
-void	map_elem_surround(t_d *data, t_m *map, int i, int j)
+void	map_elem_surround(t_data *d, t_m *map, int i, int j)
 {
 	if (map->grid[i - 1][j] == ' ' || map->grid[i + 1][j] == ' ' || map->grid[i][j - 1] == ' ' || map->grid[i][j + 1] == ' ')
-		error("map must be surrounded by walls\n", data);
+		error("map must be surrounded by walls\n", d);
 }
 
-void	check_map_errors( t_d *data, t_m *map)
+void	check_map_errors( t_data *d, t_m *map)
 {
 	int i;
 	int j;
@@ -84,13 +84,13 @@ void	check_map_errors( t_d *data, t_m *map)
 			if (!(i == 0 || j == 0 || j == (map->width - 1) || i == (map->heigth - 1)))
 			{
 				if (!is_charset(map->grid[i][j], " 120NSWE"))
-					error("unauthorised character in map\n", data);
+					error("unauthorised character in map\n", d);
 				if (is_charset(map->grid[i][j], "20NSWE"))
-					map_elem_surround(data, map, i, j);
+					map_elem_surround(d, map, i, j);
 			}
 			else
 				if(!is_charset(map->grid[i][j], " 1"))
-					error("map must be surrounded by wall\n", data);
+					error("map must be surrounded by wall\n", d);
 			j++;
 		}
 		i++;
@@ -98,108 +98,107 @@ void	check_map_errors( t_d *data, t_m *map)
 
 }
 
-void	init_player_dir(t_d *data)
+void	init_player_dir(t_data *d)
 {
-	if(data->cam.dir == 'S')
-		data->cam.rotate_angle = 0.5 * M_PI;
-	if(data->cam.dir == 'N')
-		data->cam.rotate_angle = 1.5 * M_PI;
-	if(data->cam.dir == 'W')
-		data->cam.rotate_angle =  M_PI;
-	if(data->cam.dir == 'E')
-		data->cam.rotate_angle = 2 * M_PI;
-	//printf("rotate_angle = %f\n", data->cam.rotate_angle);
+	if(d->cam.dir == 'S')
+		d->cam.rotate_angle = 0.5 * M_PI;
+	if(d->cam.dir == 'N')
+		d->cam.rotate_angle = 1.5 * M_PI;
+	if(d->cam.dir == 'W')
+		d->cam.rotate_angle =  M_PI;
+	if(d->cam.dir == 'E')
+		d->cam.rotate_angle = 2 * M_PI;
+	//printf("rotate_angle = %f\n", d->cam.rotate_angle);
 }
 
-void	init_player(t_d *data)
+void	init_player(t_data *d)
 {
-	
 	int i;
 	int j;
 	
 	i = 0;
-	data->cam.dir = 0;//supp, memset
-	while (i < data->map.heigth)
+	d->cam.dir = 0;//supp, memset
+	while (i < d->map.heigth)
 	{
 		j = 0;
-		while (j < data->map.width)
+		while (j < d->map.width)
 		{
-			if (data->map.grid[i][j] == 'N' || data->map.grid[i][j] == 'S' || data->map.grid[i][j] == 'W' || data->map.grid[i][j] == 'E')
+			if (d->map.grid[i][j] == 'N' || d->map.grid[i][j] == 'S' || d->map.grid[i][j] == 'W' || d->map.grid[i][j] == 'E')
 			{	
-				if (data->cam.dir)
-					error("there must be only one player\n", data);
+				if (d->cam.dir)
+					error("there must be only one player\n", d);
 				else
 				{
-					data->cam.dir = data->map.grid[i][j];
-					init_player_dir(data);
-					data->cam.x = j * data->map.sq_size + data->map.sq_size /2;
-					data->cam.y = i * data->map.sq_size + data->map.sq_size /2;
-					//printf("cam dir = %c\n",data->cam.dir);
+					d->cam.dir = d->map.grid[i][j];
+					init_player_dir(d);
+					d->cam.x = j * d->map.sq_size + d->map.sq_size /2 - 0.0001;
+					d->cam.y = i * d->map.sq_size + d->map.sq_size /2 - 0.0001;
+					d->map.grid[i][j] = '0';
 				}
 			}
 			j++;
 		}
 		i++;
 	}
-	if (data->cam.dir == 0)
-		error("player position is missing\n", data); 
+	if (d->cam.dir == 0)
+		error("player position is missing\n", d); 
 }
 
-void	calculate_nb_sprite(t_d *data)
+void	calculate_nb_sprite(t_data *d)
 {
 	int i;
 	int j;
 	
-	data->spri.nb_sprite = 0;
+	d->spri.nb_sprite = 0;
 	i = 0;
-	while (i < data->map.heigth)
+	while (i < d->map.heigth)
 	{
 		j = 0;
-		while (j < data->map.width)
+		while (j < d->map.width)
 		{
-			if (data->map.grid[i][j] == '2')
-				data->spri.nb_sprite++;
+			if (d->map.grid[i][j] == '2')
+				d->spri.nb_sprite++;
 			j++;
 		}
 		i++;
 	}
-	data->spri.tab = malloc(sizeof(t_st) * data->spri.nb_sprite);
+	d->spri.tab = malloc(sizeof(t_st) * d->spri.nb_sprite);
 }
 
-void	print_sprite_tab(t_d *data)
+void	print_sprite_tab(t_data *d)
 {
 	int i = 0;
-	//printf("nb sprit = %d\n", data->spri.nb_sprite);
-	while(i < data->spri.nb_sprite)
+	//printf("nb sprit = %d\n", d->spri.nb_sprite);
+	while(i < d->spri.nb_sprite)
 	{
 		//printf("spri %d ", i);	
-	//	printf("elem x = %d\n", data->spri.tab[i].pos.x);
-	//	printf("elem y = %d\n", data->spri.tab[i].pos.y);
-	//	printf("dist = %f\n", data->spri.tab[i].dist);
-	//	printf("angle = %f\n", data->spri.tab[i].angle);
-	//	printf("visible = %d\n", data->spri.tab[i].visible);
+	//	printf("elem x = %d\n", d->spri.tab[i].pos.x);
+	//	printf("elem y = %d\n", d->spri.tab[i].pos.y);
+	//	printf("dist = %f\n", d->spri.tab[i].dist);
+	//	printf("angle = %f\n", d->spri.tab[i].angle);
+	//	printf("visible = %d\n", d->spri.tab[i].visible);
 		i++;
 	}
 }
 
-void	create_sprite_tab(t_d *data)
+void	create_sprite_tab(t_data *d)
 {
 	int i;
 	int j;
-	calculate_nb_sprite(data);
+	calculate_nb_sprite(d);
 	
-	data->spri.nb_sprite = 0;
+	d->spri.nb_sprite = 0;
 	i = 0;
-	while (i < data->map.heigth)
+	while (i < d->map.heigth)
 	{
 		j = 0;
-		while (j < data->map.width)
+		while (j < d->map.width)
 		{
-			if (data->map.grid[i][j] == '2')
+			if (d->map.grid[i][j] == '2')
 			{
-				data->spri.tab[data->spri.nb_sprite].pos.y = (i * data->map.sq_size) + (data->map.sq_size / 2);
-				data->spri.tab[data->spri.nb_sprite].pos.x = (j * data->map.sq_size) + (data->map.sq_size / 2);
-				data->spri.nb_sprite++;
+				d->spri.tab[d->spri.nb_sprite].pos.y = (i * d->map.sq_size) + (d->map.sq_size / 2);
+				d->spri.tab[d->spri.nb_sprite].pos.x = (j * d->map.sq_size) + (d->map.sq_size / 2);
+				d->spri.nb_sprite++;
 			}
 			j++;
 		}
@@ -207,10 +206,10 @@ void	create_sprite_tab(t_d *data)
 	}
 }
 
-void	parse_map(t_d *data)
+void	parse_map(t_data *d)
 {
-	ft_set_map(data, &data->map);
-	check_map_errors(data, &data->map);
-	init_player(data);
-	create_sprite_tab(data);
+	ft_set_map(d, &d->map);
+	check_map_errors(d, &d->map);
+	init_player(d);
+	create_sprite_tab(d);
 }
