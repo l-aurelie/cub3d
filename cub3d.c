@@ -47,8 +47,7 @@ void	ft_set_params(t_data *d)
 //	d->res.width = d->map.sq_size * d->map.width;
 //	d->res.heigth = d->map.sq_size * d->map.heigth;
 //=======ptr
-	if (!(d->ptr.window = mlx_new_window(d->ptr.mlx, d->res.width, d->res.heigth, "cube3d")))
-		exit(EXIT_FAILURE);
+
 //=======img
 	d->ptr.img = mlx_new_image(d->ptr.mlx, d->res.width, d->res.heigth);
 	d->ptr.imgs = mlx_get_data_addr(d->ptr.img, &d->color.bpp, &d->res.size_line, &d->color.endian);
@@ -101,51 +100,52 @@ void	calculate_sprite_angle(t_st *sprite, t_data *d)
 		sprite->visible = 1;
 }
 
-void	sprite_display(t_data *d, t_st *sprit)
+void	sprite_draw(t_data *d, t_st *sprite, t_rend *s, int x_begin)
 {
-	//printf("sprite display======\n");
-	double	dist_plane;
-	t_rend	sprite;
-	int		x_begin;
-	double 	x_curr;
-	double	y_curr;
-	int		transparence;
-	double	wall_dist;
-	
-	dist_plane = (d->res.width / 2) / tan(d->ray.fov / 2);//todo fonction pour le calculer une seul fois
-	sprite.heigth = (d->map.sq_size / sprit->dist) * dist_plane;
-	sprite.begin = (d->res.heigth / 2) - (sprite.heigth / 2);
-	sprite.end = sprite.begin + sprite.heigth;
-	if (sprite.begin < 0)
-		sprite.begin = 0;
-	if (sprite.end  > d->res.heigth)
-		sprite.end = d->res.heigth;
-	
-	x_begin = dist_plane * tan(sprit->angle) + (d->res.width / 2.0) - (sprite.heigth / 2);
-//========draw
-	
-	transparence = find_text_pixel(d->color.s, 0, 0);
-	x_curr = 0;
-	while (x_begin + x_curr < 0)
-		x_curr++;
-	while (x_curr < sprite.heigth && x_begin + x_curr < d->res.width)
+	double wall_dist;
+
+	s->curr.x = 0;
+	while (x_begin + s->curr.x < 0)
+		s->curr.x++;
+	while (s->curr.x < s->heigth && x_begin + s->curr.x < d->res.width)
 	{
-		wall_dist = d->ray.ray_dist[(int)(x_begin + x_curr)];
-		if (wall_dist > sprit->dist)
+		wall_dist = d->ray.ray_dist[(int)(x_begin + s->curr.x)];
+		if (wall_dist > sprite->dist)
 		{
-			sprite.x_texture = x_curr * d->color.s.width / sprite.heigth;
-			y_curr = sprite.begin;
-			while (y_curr < sprite.end)
+			s->text.x = s->curr.x * d->color.s.width / s->heigth;
+			s->curr.y = s->begin;
+			while (s->curr.y < s->end)
 			{
-				sprite.y_texture = (y_curr + (sprite.heigth / 2.0) - (d->res.heigth / 2.0)) * ((double)d->color.s.heigth / (double)sprite.heigth);
-				sprite.color = find_text_pixel(d->color.s, sprite.x_texture, sprite.y_texture);
-				if (sprite.color != transparence)
-					my_mlx_pixel_put(d, x_begin + x_curr, y_curr, sprite.color);	
-				y_curr++;
+				s->text.y = (s->curr.y + (s->heigth / 2.0) - (d->res.heigth / 2.0)) * ((double)d->color.s.heigth / (double)s->heigth);
+				s->color = find_text_pixel(d->color.s, s->text.x, s->text.y);
+				if (s->color != s->transparence)
+					my_pixel_put(d, x_begin + s->curr.x, s->curr.y, s->color);
+				s->curr.y++;
 			}
 		}
-		x_curr++;
+		s->curr.x++;
 	}
+}
+
+void	sprite_display(t_data *d, t_st *sprite)
+{
+	//printf("sprite display======\n");
+	t_rend	s;
+	int		x_begin;
+	double	wall_dist;
+	
+	s.heigth = (d->map.sq_size / sprite->dist) * d->dist_plane;
+	s.begin = (d->res.heigth / 2) - (s.heigth / 2);
+	s.end = s.begin + s.heigth;
+	if (s.begin < 0)
+		s.begin = 0;
+	if (s.end  > d->res.heigth)
+		s.end = d->res.heigth;
+	
+	x_begin = d->dist_plane * tan(sprite->angle) + (d->res.width / 2.0) - (s.heigth / 2);
+//========draw
+	s.transparence = find_text_pixel(d->color.s, 0, 0);
+	sprite_draw(d, sprite, &s, x_begin);
 }
 
 void	sprite_render(t_data *d)
@@ -337,36 +337,33 @@ int		find_text_pixel(t_t text, int x_texture, int y_texture)
 
 void	disp_wall_text(t_data *d, int col, t_rend *wall, t_t *text)
 {
-	int y;
-
 	if(d->ray.found_v)
-		wall->x_texture = fmod(d->ray.v_hit_y / d->map.sq_size, 1) * text->width;
+		wall->text.x = fmod(d->ray.v_hit_y / d->map.sq_size, 1) * text->width;
 	if(d->ray.found_h)
-		wall->x_texture = fmod(d->ray.h_hit_x / d->map.sq_size, 1) * text->width;
+		wall->text.x = fmod(d->ray.h_hit_x / d->map.sq_size, 1) * text->width;
 	if ((d->ray.down && d->ray.found_h)/*south*/ || (d->ray.left && d->ray.found_v)/*west*/)
-        wall->x_texture = 64 - wall->x_texture;	
+        wall->text.x = 64 - wall->text.x;	
 	if (wall->begin < 0)
 		wall->begin = 0;
 	if (wall->end > d->res.heigth)
 		wall->end = d->res.heigth;
-	y = wall->begin;
-	while (y < wall->end)
+	wall->curr.y = wall->begin;
+	while (wall->curr.y < wall->end)
 	{
-		wall->y_texture = (y + (wall->heigth / 2.0) - (d->res.heigth / 2.0)) * ((double)text->heigth / (double)wall->heigth);
-		my_mlx_pixel_put(d, col, y, find_text_pixel(*text, wall->x_texture, wall->y_texture));
-		y++;
+		wall->text.y = (wall->curr.y + (wall->heigth / 2.0) - (d->res.heigth / 2.0)) * ((double)text->heigth / (double)wall->heigth);
+		my_pixel_put(d, col, wall->curr.y, find_text_pixel(*text, wall->text.x, wall->text.y));
+		wall->curr.y++;
 	}	
 }
 
 void	wall_display(t_data *d, int column)
 {
-	double	dist_plane;
 	t_rend	wall;
 	double	correct_dist;
 
 	correct_dist = d->ray.ray_dist[column] * cos(d->ray.ray_angle - d->cam.rotate_angle);
-	dist_plane = (d->res.width / 2) / tan(d->ray.fov / 2);
-	wall.heigth = (d->map.sq_size / correct_dist) * dist_plane;
+	d->dist_plane = (d->res.width / 2) / tan(d->ray.fov / 2);
+	wall.heigth = (d->map.sq_size / correct_dist) * d->dist_plane;
 	wall.begin = (d->res.heigth / 2) - (wall.heigth / 2);
 	wall.end = wall.begin + wall.heigth;
 	disp_vertical_line(d, column, 0, wall.begin, d->color.ceiling);
@@ -474,7 +471,7 @@ int		ft_loop(t_data *d)
 	//display_2d(d);
 	raycasting(d);
 	mlx_put_image_to_window(d->ptr.mlx, d->ptr.window, d->ptr.img, 0, 0);
-	mlx_do_sync(d->ptr.mlx);
+//	mlx_do_sync(d->ptr.mlx);
 	return (0);
 }
 
@@ -496,7 +493,7 @@ void	free_mlx(t_data *d)
 	//mlx_do_sync(params->mlx_ptr);
 	if (d->ptr.window)
 		mlx_destroy_window(d->ptr.mlx, d->ptr.window);
-		mlx_destroy_display(d->ptr.mlx);
+	mlx_destroy_display(d->ptr.mlx);
 	if (d->ptr.mlx)
 		ft_free((void **)&d->ptr.mlx);
 }
@@ -564,7 +561,9 @@ int		main(int argc, char **argv)
 	parse_cub(argv[1], &d);
 	ft_set_params(&d);
 	if (argc == 2)
-	{
+	{	
+		if (!(d.ptr.window = mlx_new_window(d.ptr.mlx, d.res.width, d.res.heigth, "cube3d")))
+			exit(EXIT_FAILURE);
 		mlx_hook(d.ptr.window, KEYPRESS, 1L<<0, key_press, (void *)&d);
 		mlx_hook(d.ptr.window, KEYRELEASE, 1L<<1, key_release, (void *)&d.cam);
 		mlx_hook(d.ptr.window, 33, (1L << 17), ft_exit_game, (void *)&d);
@@ -575,7 +574,8 @@ int		main(int argc, char **argv)
 	else if (argc == 3)
 	{
 		d.pars.save = 1;
-//		ft_create_bmp(&d);
+		raycasting(&d);
+		ft_create_bmp(&d);
 		ft_exit_game(&d);
 	}
 	return (0);

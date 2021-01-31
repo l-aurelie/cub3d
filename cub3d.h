@@ -3,7 +3,7 @@
 #include <math.h>
 #include "mlx.h"
 #include "libft.h"
-//#include "bmp.h"
+#include "bmp.h"
 #include <stdlib.h>
 #include <fcntl.h>
 
@@ -46,9 +46,10 @@ typedef struct	s_rend
 	double	heigth;
 	int		begin;
 	int		end;
-	int		x_texture;
-	int		y_texture;
+	t_ipos	text;
 	int		color;
+	int		transparence;
+	t_ipos	curr;
 }				t_rend;
 
 typedef struct	s_ra
@@ -166,6 +167,7 @@ typedef struct	s_d
 	t_ra	ray;
 	t_sp	spri;
 	t_pa	pars;
+	double	dist_plane;
 }				t_data;
 
 void	disp_square(int x, int y, int color, t_data *d, int width);
@@ -173,7 +175,7 @@ void	ft_set_params(t_data *d);
 void	disp_vertical_line(t_data *d, int x, int y1, int y2, int color);
 void	draw_line(int x0, int y0, int x1, int y1, int color, t_data *d);
 void	parse_cub(char *map, t_data *d);
-void	my_mlx_pixel_put(t_data *d, int x, int y, int color);
+void	my_pixel_put(t_data *d, int x, int y, int color);
 void	print_map(t_m map);
 void	ft_disp_minimap(t_m map, t_p ptr, t_data *d);
 void	ft_disp_map(t_m map, t_p ptr, t_data *d);

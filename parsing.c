@@ -205,31 +205,26 @@ void	error_index(t_data *d, char *line, int *all_elem, int index)
 			error("missing or to many color informations\n", d);
 		}
 	else
-		error("wrong element in display d\n", d);
+		error("wrong element in display data\n", d);
 }
 
-void	parse_cub(char *map, t_data *d)
+void	get_display_data(t_data *d, int *ret, int fd)
 {
-	int		fd;
-	char	*map_elem;
+	char	*display_elem;
 	int 	index;
-	int		ret;
 	int		all_elem[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	static void (*f[])() = {&parse_res, &parse_text, &parse_text, &parse_text, &parse_text, &parse_color, &parse_color};	
 	
-	map_elem = "RNSWEFC";
-	fd = open(map, O_RDONLY);
-	d->map.s_map = ft_strdup("\0");
-	ret = 1;
-	while (ret > 0 && !is_full_tab(all_elem, 8))
+	display_elem = "RNSWEFC";
+	while (*ret > 0 && !is_full_tab(all_elem, 8))
 	{
-		ret = get_next_line(fd, &d->pars.line);
+		*ret = get_next_line(fd, &d->pars.line);
 		d->pars.line = ft_strtrim(d->pars.line, " ", 1);
 		if (d->pars.line[0])
 		{
 			if(d->pars.line[0] == 'S' && d->pars.line[1] == 'O')
 				all_elem[7] += 1;
-			index = ft_chr_pos(map_elem, d->pars.line[0]);
+			index = ft_chr_pos(display_elem, d->pars.line[0]);
 			if (index == -1)
 				error_index(d, d->pars.line, all_elem, index);
 		
@@ -239,7 +234,17 @@ void	parse_cub(char *map, t_data *d)
 		}
 		ft_free((void **)&d->pars.line);
 	}
+}
 
+void	parse_cub(char *map, t_data *d)
+{
+	int		fd;	
+	int		ret;
+
+	ret = 1;
+	fd = open(map, O_RDONLY);	
+	get_display_data(d, &ret, fd);
+	d->map.s_map = ft_strdup("\0");
 	d->pars.line = ft_strdup("\0");
 	while (ret > 0 && ft_strlen(d->pars.line) == 0)
 	{

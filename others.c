@@ -21,7 +21,7 @@ void	draw_line(int x0, int y0, int x1, int y1, int color, t_data *d)
   int err = dx + dy, e2; /* error value e_xy */
  
   for (;;){  /* loop */
-			my_mlx_pixel_put(d, x0, y0, color);
+			my_pixel_put(d, x0, y0, color);
 	if (x0 == x1 && y0 == y1) break;
     e2 = 2 * err;
     if (e2 >= dy) { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
@@ -44,13 +44,13 @@ void	disp_vertical_line(t_data *d, int x, int y1, int y2, int color)
 	}
 	while (j < y2)
 	{
-		my_mlx_pixel_put(d, x, j, color);
+		my_pixel_put(d, x, j, color);
 		j++;
 	}
 
 }
 
-void	my_mlx_pixel_put(t_data *d, int x, int y, int color)
+void	my_pixel_put(t_data *d, int x, int y, int color)
 {
     char *dst;
 	dst = d->ptr.imgs + (y * d->res.size_line + x * (d->color.bpp / 8));
@@ -69,9 +69,9 @@ void	disp_square(int x, int y, int color, t_data *d, int width)
 		while (i >= x)
 		{
 			if (j == y || /*j == y + width ||*/ i == x /*|| i == x + width*/)
-				my_mlx_pixel_put(d, i, j, 0xd3d3d3);
+				my_pixel_put(d, i, j, 0xd3d3d3);
 			else
-				my_mlx_pixel_put(d, i, j, color);
+				my_pixel_put(d, i, j, color);
 			i--;
 		}
 		j--;
