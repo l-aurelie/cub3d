@@ -47,9 +47,9 @@ void	free_matrix(int ***matrix, int heigth)
 int		count_strtab_elem(char **str)
 {
 	int i;
-	
+
 	i = 0;
-	while(str[i])
+	while (str[i])
 		i++;
 	return (i);
 }
@@ -85,16 +85,19 @@ void	get_text_tab(char *texture, t_data *d, t_t *struc)
 	fd = open(texture, O_RDONLY);
 	if (fd == -1)
 		error("texture file cannot be open\n", d);
-	close (fd);
+	close(fd);
 	struc->path = texture;
-	struc->img = mlx_xpm_file_to_image(d->ptr.mlx, struc->path, &struc->width, &struc->heigth);
-//NULL
-	struc->imgs = mlx_get_data_addr(struc->img, &struc->bpp, &struc->size_line, &struc->endian);
+	struc->img = mlx_xpm_file_to_image(d->ptr.mlx, struc->path, &struc->width,
+		&struc->heigth);
+	if (struc->img == NULL)
+		error("fonction mlx_xpm_file_to_image failed\n", d);
+	struc->imgs = mlx_get_data_addr(struc->img, &struc->bpp, &struc->size_line,
+		&struc->endian);
 }
 
 void	parse_text(t_data *d, char *line)
 {
-	d->pars.split =	ft_split(line , ' ');
+	d->pars.split = ft_split(line, ' ');
 	if (count_strtab_elem(d->pars.split) != 2)
 		error("texture_name_error\n", d);
 	if (ft_strcmp(d->pars.split[0], "NO") == 0)
@@ -117,7 +120,7 @@ int		*get_color_tab(t_data *d, char ***split, int **rgb)
 	int i;
 
 	i = 0;
-	(*split)[0] = ft_substr((*split[0]), 1, ft_strlen((*split[0])) -1, 1);
+	(*split)[0] = ft_substr((*split[0]), 1, ft_strlen((*split[0])) - 1, 1);
 	*rgb = malloc(sizeof(int) * 3);
 	while ((*split)[i])
 	{
@@ -140,16 +143,17 @@ void	parse_color(t_data *d, char *line)
 	d->pars.split = ft_split(line, ',');
 	if (count_strtab_elem(d->pars.split) != 3)
 		error("color rgb wrong number of element\n", d);
-
 	if (ft_strncmp(d->pars.split[0], "C ", 2) == 0)
 	{
-		d->pars.rgb = get_color_tab(d,&d->pars.split, &d->pars.rgb);
-		d->color.ceiling = (d->pars.rgb[0] << 16) + (d->pars.rgb[1] << 8) + d->pars.rgb[2];
+		d->pars.rgb = get_color_tab(d, &d->pars.split, &d->pars.rgb);
+		d->color.ceiling = (d->pars.rgb[0] << 16) + (d->pars.rgb[1] << 8) +
+			d->pars.rgb[2];
 	}
 	else if (ft_strncmp(d->pars.split[0], "F ", 2) == 0)
 	{
 		d->pars.rgb = get_color_tab(d, &d->pars.split, &d->pars.rgb);
-		d->color.floor = (d->pars.rgb[0] << 16) + (d->pars.rgb[1] << 8) + d->pars.rgb[2];
+		d->color.floor = (d->pars.rgb[0] << 16) + (d->pars.rgb[1] << 8) +
+			d->pars.rgb[2];
 	}
 	else
 		error("wrong element in color\n", d);
@@ -161,12 +165,13 @@ void	parse_res(t_data *d, char *line)
 	int max_width;
 	int max_heigth;
 
-	d->pars.split =	ft_split(line , ' ');
+	d->pars.split = ft_split(line, ' ');
 	if (count_strtab_elem(d->pars.split) != 3)
 		error("resolution wrong number of elements\n", d);
 	if (ft_strcmp(d->pars.split[0], "R"))
 		error("wrong element in resolution\n", d);
-	if (!(ft_str_is_numeric(d->pars.split[1]) && ft_str_is_numeric(d->pars.split[2])))
+	if (!(ft_str_is_numeric(d->pars.split[1]) &&
+		ft_str_is_numeric(d->pars.split[2])))
 		error("resolution must be numeric\n", d);
 	d->res.width = ft_atoi(d->pars.split[1]);
 	d->res.heigth = ft_atoi(d->pars.split[2]);
@@ -174,7 +179,8 @@ void	parse_res(t_data *d, char *line)
 		error("resolution can't be negative or 0\n", d);
 	free_split(&d->pars.split);
 	mlx_get_screen_size(d->ptr.mlx, &max_width, &max_heigth);
-	if (d->pars.save != 1 && (d->res.width > max_width || d->res.heigth > max_heigth))
+	if (d->pars.save != 1 && (d->res.width > max_width || d->res.heigth >
+		max_heigth))
 	{
 		d->res.width = max_width;
 		d->res.heigth = max_heigth;
@@ -187,22 +193,25 @@ void	error_index(t_data *d, char *line, int *all_elem, int index)
 	{
 		if (all_elem[0] != 1)
 			error("missing  or multiple resolution informations\n", d);
-		if (all_elem[1] != 1 || all_elem[2] != 1 || all_elem[3] != 1 || all_elem[4] != 1 || all_elem[7] != 1)
+		if (all_elem[1] != 1 || all_elem[2] != 1 || all_elem[3] != 1 ||
+			all_elem[4] != 1 || all_elem[7] != 1)
 			error("missing or to many texture informations\n", d);
 		if (all_elem[5] != 1 || all_elem[6] != 1)
 			error("missing or to many color informations\n", d);
-		}
+	}
 	else
 		error("wrong element in display data\n", d);
 }
 
 void	get_display_data(t_data *d, int *ret, int fd)
 {
-	char	*display_elem;
-	int 	index;
-	int		all_elem[8] = {0, 0, 0, 0, 0, 0, 0, 0};//memset
-	static void (*f[])() = {&parse_res, &parse_text, &parse_text, &parse_text, &parse_text, &parse_color, &parse_color};
+	char		*display_elem;
+	int			index;
+	int			all_elem[8];
+	static void	(*f[])() = {&parse_res, &parse_text, &parse_text, &parse_text,
+		&parse_text, &parse_color, &parse_color};
 
+	ft_memset(&all_elem, 0, sizeof(int) * 8);
 	display_elem = "RNSWEFC";
 	while (*ret > 0 && !is_full_tab(all_elem, 8))
 	{
@@ -215,7 +224,6 @@ void	get_display_data(t_data *d, int *ret, int fd)
 			index = ft_chr_pos(display_elem, d->pars.line[0]);
 			if (index == -1)
 				error_index(d, d->pars.line, all_elem, index);
-
 			(*f[index])(d, d->pars.line);
 			if (!(d->pars.line[0] == 'S' && d->pars.line[1] == 'O'))
 				all_elem[index] += 1;

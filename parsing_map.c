@@ -1,7 +1,5 @@
 #include "./includes/cub3d.h"
 
-
-
 void	ft_size_map(char *str, t_m *map)
 {
 	int i;
@@ -13,7 +11,7 @@ void	ft_size_map(char *str, t_m *map)
 	{
 		i = 0;
 		while ( str[i] && str[i] != ',')
-			i++;	
+			i++;
 		if (i > map->width)
 			map->width = i;
 		str = str + i;
@@ -25,14 +23,14 @@ void	ft_size_map(char *str, t_m *map)
 
 void	ft_set_map(t_data *d, t_m *map)
 {
-	int **grid; 
-	int i; 
+	int **grid;
+	int i;
 	int j;
 	char *s;
-	
+
 	s = map->s_map;
 	i = 0;
-	map->sq_size = 32;//#
+	map->sq_size = 32;
  	ft_size_map(map->s_map, map);
 	grid = malloc(sizeof (int *) * map->heigth);
 	while(i < map->heigth)
@@ -41,7 +39,7 @@ void	ft_set_map(t_data *d, t_m *map)
 	 	grid[i][map->width] = '\0';
 		i++;
 	}
-	i = 0; 
+	i = 0;
 	while (i < map->heigth && *s)
 	{
 		j = 0;
@@ -61,7 +59,6 @@ void	ft_set_map(t_data *d, t_m *map)
 	}
 	map->grid = grid;
 	ft_free((void **)&map->s_map);
-//print_map(*map); 
 }
 
 void	map_elem_surround(t_data *d, t_m *map, int i, int j)
@@ -74,7 +71,7 @@ void	check_map_errors( t_data *d, t_m *map)
 {
 	int i;
 	int j;
-	
+
 	i = 0;
 	while (i < map->heigth)
 	{
@@ -95,7 +92,6 @@ void	check_map_errors( t_data *d, t_m *map)
 		}
 		i++;
 	}
-
 }
 
 void	init_player_dir(t_data *d)
@@ -108,23 +104,21 @@ void	init_player_dir(t_data *d)
 		d->cam.rotate_angle =  M_PI;
 	if(d->cam.dir == 'E')
 		d->cam.rotate_angle = 2 * M_PI;
-	//printf("rotate_angle = %f\n", d->cam.rotate_angle);
 }
 
 void	init_player(t_data *d)
 {
 	int i;
 	int j;
-	
+
 	i = 0;
-	d->cam.dir = 0;//supp, memset
 	while (i < d->map.heigth)
 	{
 		j = 0;
 		while (j < d->map.width)
 		{
 			if (d->map.grid[i][j] == 'N' || d->map.grid[i][j] == 'S' || d->map.grid[i][j] == 'W' || d->map.grid[i][j] == 'E')
-			{	
+			{
 				if (d->cam.dir)
 					error("there must be only one player\n", d);
 				else
@@ -141,7 +135,7 @@ void	init_player(t_data *d)
 		i++;
 	}
 	if (d->cam.dir == 0)
-		error("player position is missing\n", d); 
+		error("player position is missing\n", d);
 }
 
 void	calculate_nb_sprite(t_data *d)

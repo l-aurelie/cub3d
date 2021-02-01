@@ -144,7 +144,7 @@ void	sprite_display(t_data *d, t_st *sprite)
 	double	wall_dist;
 
 //	s.heigth = (d->map.sq_size / sprite->dist) * d->dist_plane;
-	s.heigth = d->dist_plane / (cos(sprite->angle) * sprite->dist / 32);	
+	s.heigth = d->dist_plane / (cos(sprite->angle) * sprite->dist / d->map.sq_size);	
 	s.begin = (d->res.heigth / 2) - (s.heigth / 2);
 	s.end = s.begin + s.heigth;
 	if (s.begin < 0)
