@@ -1,6 +1,5 @@
 #include "./includes/cub3d.h"
 
-
 int		ft_str_is_numeric(char *str)
 {
 	int i;
@@ -13,13 +12,6 @@ int		ft_str_is_numeric(char *str)
 		i++;
 	}
 	return (1);
-}
-
-int		ft_free(void **ptr)
-{
-	free(*ptr);
-	*ptr = NULL;
-	return (0);
 }
 
 void	free_split(char ***split)
@@ -64,19 +56,19 @@ int		count_strtab_elem(char **str)
 
 int		is_full_tab(int *tab, int size)
 {
-	int i; 
-	
+	int i;
+
 	i = 0;
 	while (i < size)
 	{
 		if (tab[i] != 1)
-			return(0);
+			return (0);
 		i++;
 	}
-	return(1);
+	return (1);
 }
 
-void	error(char *str, t_data *d)//TODO gestion erreur a faire + free
+void	error(char *str, t_data *d)
 {
 	printf("%s", str);
 	free_struct(d);
@@ -87,8 +79,8 @@ void	error(char *str, t_data *d)//TODO gestion erreur a faire + free
 void	get_text_tab(char *texture, t_data *d, t_t *struc)
 {
 	int fd;
-	
-	if(ft_strcmp(texture + ft_strlen(texture) - 4, ".xpm"))
+
+	if (ft_strcmp(texture + ft_strlen(texture) - 4, ".xpm"))
 		error("texture extension file must be .xpm\n", d);
 	fd = open(texture, O_RDONLY);
 	if (fd == -1)
@@ -102,7 +94,6 @@ void	get_text_tab(char *texture, t_data *d, t_t *struc)
 
 void	parse_text(t_data *d, char *line)
 {
-	
 	d->pars.split =	ft_split(line , ' ');
 	if (count_strtab_elem(d->pars.split) != 2)
 		error("texture_name_error\n", d);
@@ -121,18 +112,6 @@ void	parse_text(t_data *d, char *line)
 	free_split(&d->pars.split);
 }
 
-/*void	print_tab(int *tab, int size)
-{
-	int i = 0; 
-
-	while (i < size)
-	{
-		printf("%d, ", tab[i]);
-		i++;
-	}
-		printf("\n");
-}*/
-
 int		*get_color_tab(t_data *d, char ***split, int **rgb)
 {
 	int i;
@@ -140,7 +119,7 @@ int		*get_color_tab(t_data *d, char ***split, int **rgb)
 	i = 0;
 	(*split)[0] = ft_substr((*split[0]), 1, ft_strlen((*split[0])) -1, 1);
 	*rgb = malloc(sizeof(int) * 3);
-	while((*split)[i])
+	while ((*split)[i])
 	{
 		(*split)[i] = ft_strtrim((*split)[i], " ", 1);
 		if (!(*split)[i][0])
@@ -148,13 +127,14 @@ int		*get_color_tab(t_data *d, char ***split, int **rgb)
 		if (!ft_str_is_numeric((*split)[i]))
 			error("color must contain only digit separated by comas\n", d);
 		(*rgb)[i] = ft_atoi((*split)[i]);
-		if(!((*rgb)[i] >= 0 && (*rgb)[i] <= 255))
+		if (!((*rgb)[i] >= 0 && (*rgb)[i] <= 255))
 			error("rgb must be between 0 and 255\n", d);
 		i++;
 	}
 	free_split(split);
 	return (*rgb);
 }
+
 void	parse_color(t_data *d, char *line)
 {
 	d->pars.split = ft_split(line, ',');
@@ -190,21 +170,23 @@ void	parse_res(t_data *d, char *line)
 		error("resolution must be numeric\n", d);
 	d->res.width = ft_atoi(d->pars.split[1]);
 	d->res.heigth = ft_atoi(d->pars.split[2]);
-	if(!(d->res.width > 0 && d->res.heigth > 0))
+	if (!(d->res.width > 0 && d->res.heigth > 0))
 		error("resolution can't be negative or 0\n", d);
 	free_split(&d->pars.split);
 	mlx_get_screen_size(d->ptr.mlx, &max_width, &max_heigth);
 	if (d->pars.save != 1 && (d->res.width > max_width || d->res.heigth > max_heigth))
-		d->res.width = max_width; 
+	{
+		d->res.width = max_width;
 		d->res.heigth = max_heigth;
+	}
 }
 
 void	error_index(t_data *d, char *line, int *all_elem, int index)
 {
-	if(index == -1 && line[0] == '1' && line[1] == '1')
+	if (index == -1 && line[0] == '1' && line[1] == '1')
 	{
 		if (all_elem[0] != 1)
-			error("missing  or multiple resolution informations\n", d);	
+			error("missing  or multiple resolution informations\n", d);
 		if (all_elem[1] != 1 || all_elem[2] != 1 || all_elem[3] != 1 || all_elem[4] != 1 || all_elem[7] != 1)
 			error("missing or to many texture informations\n", d);
 		if (all_elem[5] != 1 || all_elem[6] != 1)
@@ -218,9 +200,9 @@ void	get_display_data(t_data *d, int *ret, int fd)
 {
 	char	*display_elem;
 	int 	index;
-	int		all_elem[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	static void (*f[])() = {&parse_res, &parse_text, &parse_text, &parse_text, &parse_text, &parse_color, &parse_color};	
-	
+	int		all_elem[8] = {0, 0, 0, 0, 0, 0, 0, 0};//memset
+	static void (*f[])() = {&parse_res, &parse_text, &parse_text, &parse_text, &parse_text, &parse_color, &parse_color};
+
 	display_elem = "RNSWEFC";
 	while (*ret > 0 && !is_full_tab(all_elem, 8))
 	{
@@ -228,14 +210,14 @@ void	get_display_data(t_data *d, int *ret, int fd)
 		d->pars.line = ft_strtrim(d->pars.line, " ", 1);
 		if (d->pars.line[0])
 		{
-			if(d->pars.line[0] == 'S' && d->pars.line[1] == 'O')
+			if (d->pars.line[0] == 'S' && d->pars.line[1] == 'O')
 				all_elem[7] += 1;
 			index = ft_chr_pos(display_elem, d->pars.line[0]);
 			if (index == -1)
 				error_index(d, d->pars.line, all_elem, index);
-		
+
 			(*f[index])(d, d->pars.line);
-			if(!(d->pars.line[0] == 'S' && d->pars.line[1] == 'O'))
+			if (!(d->pars.line[0] == 'S' && d->pars.line[1] == 'O'))
 				all_elem[index] += 1;
 		}
 		ft_free((void **)&d->pars.line);
@@ -244,11 +226,11 @@ void	get_display_data(t_data *d, int *ret, int fd)
 
 void	parse_cub(char *map, t_data *d)
 {
-	int		fd;	
+	int		fd;
 	int		ret;
 
 	ret = 1;
-	fd = open(map, O_RDONLY);	
+	fd = open(map, O_RDONLY);
 	get_display_data(d, &ret, fd);
 	d->map.s_map = ft_strdup("\0");
 	d->pars.line = ft_strdup("\0");

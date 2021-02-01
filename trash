@@ -1,3 +1,18 @@
+//2d====== in castray
+	//	draw_line(d->cam.x, d->cam.y, d->ray.hit_x , d->ray.hit_y, 0x00ff00, d);
+
+void	display_2d(t_data *d)
+{
+	d->res.width = d->map.sq_size * d->map.width;
+	d->res.heigth = d->map.sq_size * d->map.heigth;
+	mlx_clear_window(d->ptr.mlx, d->ptr.window);
+	ft_disp_map(d->map, d->ptr, d);
+	disp_square(d->cam.x, d->cam.y, 0xffff00, d, 3);
+
+	cast_rays(d);
+	draw_line(d->cam.x, d->cam.y, (d->cam.x + cos(d->cam.rotate_angle) * 30), (d->cam.y + sin(d->cam.rotate_angle) * 30), 0x000000, d);
+}
+
 /*void	disp_line(double a_x, double a_y, double b_x, double b_y, int color, t_p ptr)
 {
 	printf("disp_line\n");

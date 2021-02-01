@@ -195,7 +195,7 @@ void	ft_set_map(t_data *d, t_m *map);
 void	error(char *sterror, t_data *d);
 void	parse_map(t_data *d);
 int		ft_exit_game(t_data *d);  
-int		ft_free(void **ptr);
+//int		ft_free(void **ptr);
 void	free_matrix(int ***matrix, int heigth);
 void	free_mlx(t_data *d);
 void	free_struct(t_data *d);
