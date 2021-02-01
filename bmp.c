@@ -1,4 +1,4 @@
-#include "cub3d.h"
+#include "./includes/cub3d.h"
 
 void  get_header_info(t_data *d, t_i *head_info, t_h *header)
 {

@@ -1,4 +1,4 @@
-#include "cub3d.h"
+#include "./includes/cub3d.h"
 
 
 int		ft_str_is_numeric(char *str)
@@ -178,7 +178,9 @@ void	parse_color(t_data *d, char *line)
 
 void	parse_res(t_data *d, char *line)
 {
-	
+	int max_width;
+	int max_heigth;
+
 	d->pars.split =	ft_split(line , ' ');
 	if (count_strtab_elem(d->pars.split) != 3)
 		error("resolution wrong number of elements\n", d);
@@ -191,6 +193,10 @@ void	parse_res(t_data *d, char *line)
 	if(!(d->res.width > 0 && d->res.heigth > 0))
 		error("resolution can't be negative or 0\n", d);
 	free_split(&d->pars.split);
+	mlx_get_screen_size(d->ptr.mlx, &max_width, &max_heigth);
+	if (d->pars.save != 1 && (d->res.width > max_width || d->res.heigth > max_heigth))
+		d->res.width = max_width; 
+		d->res.heigth = max_heigth;
 }
 
 void	error_index(t_data *d, char *line, int *all_elem, int index)

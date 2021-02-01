@@ -1,4 +1,4 @@
-#include "cub3d.h"
+#include "./includes/cub3d.h"
 #include <math.h>
 
 //TODO = memset d 
@@ -27,14 +27,14 @@ int		key_press(int key, t_data *d)
 
 int		key_release(int key, t_ca *cam)
 {
-	if (key == KEY_W)//devant
+	if (key == KEY_W || key == KEY_S || key == KEY_D || key == KEY_A)//devant
 		cam->walk_dir = 0; 
-	else if (key == KEY_S)//bas
-		cam->walk_dir = 0;
-	else if (key == KEY_D)//droite 
-		cam->walk_dir = 0; 
-	else if (key == KEY_A)//gauche
-		cam->walk_dir = 0;
+//	else if (key == KEY_S )//bas
+		//cam->walk_dir = 0;
+//	else if (key == KEY_D)//droite 
+		//cam->walk_dir = 0; 
+//	else if (key == KEY_A)//gauche
+		//cam->walk_dir = 0;
 	else if (key == KEY_LEFT)//gauche
 		cam->turn_dir = 0;
 	else if (key == KEY_RIGHT)//dte

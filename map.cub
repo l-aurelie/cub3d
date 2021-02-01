@@ -1,5 +1,5 @@
     
-R 1000   500
+R 1500   1000
     NO ./textures/colorstone.xpm 
 SO ./textures/brick.xpm
 WE ./textures/moss.xpm
