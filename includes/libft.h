@@ -6,7 +6,7 @@
 /*   By: aleconte <aleconte@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/19 17:46:10 by aleconte          #+#    #+#             */
-/*   Updated: 2020/12/06 15:50:40 by aleconte         ###   ########.fr       */
+/*   Updated: 2021/02/02 23:32:28 by aleconte         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,16 +69,18 @@ void			ft_lstiter(t_list *lst, void (*f)(void *));
 t_list			*ft_lstmap(t_list *lst, void *(*f)(void *), \
 				void (*del)(void *));
 
-int		ft_strcmp(char *s1, char *s2);
+int				ft_strcmp(char *s1, char *s2);
 
-int		ft_chr_pos(char *str, char c);
-int		is_charset(char c, char *charset);
-int		ft_free(void **ptr);
+int				ft_chr_pos(char *str, char c);
+int				is_charset(char c, char *charset);
+int				ft_free(void **ptr);
 
-int		ft_check_buffer_nl(char *buffer);
-char	*ft_strjoin_line(char *s1, char const *s2);
-char	*prep_line(char *buff, char *line_result, int len);
-int		ft_read_line(int fd, char **line, char *buff, char *line_result);
-int		get_next_line(int fd, char **line);
+int				ft_check_buffer_nl(char *buffer);
+char			*ft_strjoin_line(char *s1, char const *s2);
+char			*prep_line(char *buff, char *line_result, int len);
+int				ft_read_line(int fd, char **line, char *buff, \
+				char *line_result);
+
+int				get_next_line(int fd, char **line);
 
 #endif

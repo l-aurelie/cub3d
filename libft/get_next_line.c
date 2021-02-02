@@ -6,7 +6,7 @@
 /*   By: aleconte <aleconte@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/22 13:23:26 by aleconte          #+#    #+#             */
-/*   Updated: 2021/02/02 17:08:05 by aleconte         ###   ########.fr       */
+/*   Updated: 2021/02/03 00:20:24 by aleconte         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,7 @@ int		ft_read_line(int fd, char **line, char *buff, char *line_result)
 		return (-1);
 	if (**line && ret == 0)
 		return (1);
-	if (ret == 0)
-		return (0);
+	return (ret == 0 ? 0 : -1);
 }
 
 int		get_next_line(int fd, char **line)

@@ -6,7 +6,7 @@ NO ./textures/purplestone.xpm
 SO ./textures/colorstone.xpm
 WE ./textures/brick.xpm
 EA ./textures/moss.xpm
-S ./textures/eagle.xpm
+S ./textures/tree.xpm
 F 220,100,0
 C 225,30,0
         1111111111111111111111111
