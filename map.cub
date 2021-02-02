@@ -1,27 +1,27 @@
     
-R 5000   5000
-    NO ./textures/colorstone.xpm 
-SO ./textures/brick.xpm
-WE ./textures/moss.xpm
-EA ./textures/wood.xpm
-S ./textures/eagle.xpm
-F    44 ,  12  ,  8
-C     212, 172  ,13    
+R 2000   2000
+    NO ./textures/wall-4.xpm 
+SO ./textures/wall-1.xpm
+WE ./textures/wall-3.xpm
+EA ./textures/wall-2.xpm
+S ./textures/tree.xpm
+F    86 ,  130  ,  3
+C   107  , 212  ,225    
 
 
  11111111111
 100022000121
 100000000001  
-100000000001
+1000000000011
+10010000000001
 1000000000001
 1000000000001
-1000000000001
-1000000000001
+1000001100001
 100S000000001
-1000000200001
+1000000000001
 1100000000001
 100000000001
-100000020001
+100000000001
 100000000001
 100000000001
 100000000001

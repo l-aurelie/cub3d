@@ -85,6 +85,7 @@ typedef struct	s_ca
 	char	dir;
 	int		turn_dir;
 	int		walk_dir;
+	int		side_dir;
 	double 	rotate_angle;
 	double	move_speed;
 	double	rotate_speed; 

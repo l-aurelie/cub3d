@@ -179,10 +179,12 @@ void	parse_res(t_data *d, char *line)
 		error("resolution can't be negative or 0\n", d);
 	free_split(&d->pars.split);
 	mlx_get_screen_size(d->ptr.mlx, &max_width, &max_heigth);
-	if (d->pars.save != 1 && d->res.width > max_width)
+	if (d->pars.save != 1 && (d->res.width > max_width || d->res.heigth >
+		max_heigth))
+	{
 		d->res.width = max_width;
-	if (d->pars.save != 1 && d->res.heigth > max_heigth)
 		d->res.heigth = max_heigth;
+	}
 }
 
 void	error_index(t_data *d, char *line, int *all_elem, int index)

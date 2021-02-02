@@ -3,17 +3,14 @@
 
 int		key_press(int key, t_data *d)
 {
-	d->cam.side_move = 0;
-	if (key == KEY_A || key == KEY_D)
-		d->cam.side_move = 1;
 	if (key == KEY_W)
 		d->cam.walk_dir = 1;
 	else if (key == KEY_S)
 		d->cam.walk_dir = -1;
 	else if (key == KEY_D)
-		d->cam.walk_dir = 1;
+		d->cam.side_dir = 1;
 	else if (key == KEY_A)
-		d->cam.walk_dir = -1;
+		d->cam.side_dir = -1;
 	else if (key == KEY_LEFT)
 		d->cam.turn_dir = -1;
 	else if (key == KEY_RIGHT)
@@ -30,9 +27,9 @@ int		key_release(int key, t_data *d)
 	else if (key == KEY_S)
 		d->cam.walk_dir = 0;
 	else if (key == KEY_D)
-		d->cam.walk_dir = 0;
+		d->cam.side_dir = 0;
 	else if (key == KEY_A)
-		d->cam.walk_dir = 0;
+		d->cam.side_dir = 0;
 	else if (key == KEY_LEFT)
 		d->cam.turn_dir = 0;
 	else if (key == KEY_RIGHT)
@@ -47,8 +44,8 @@ void	ft_set_params(t_data *d)
 		error("fonction mlx_new_image goes wrong\n", d);
 	d->ptr.imgs = mlx_get_data_addr(d->ptr.img, &d->color.bpp,
 		&d->res.size_line, &d->color.endian);
-	d->cam.move_speed = 1.0;
-	d->cam.rotate_speed = 1.0 * (M_PI / 180);
+	d->cam.move_speed = 2.0;
+	d->cam.rotate_speed = 2.0 * (M_PI / 180);
 	d->ray.fov = 60 * (M_PI / 180);
 	d->ray.nb_rays = d->res.width;
 	d->ray.ray_dist = malloc(sizeof(double) * d->res.width);//TODO protection
@@ -104,8 +101,8 @@ void	calculate_sprite_angle(t_st *sprite, t_data *d)
 	sprite->angle = total_angle - d->cam.rotate_angle;
 	sprite->angle = normalize_angle(sprite->angle);
 	sprite->visible = 0;
-	if (d_abs(sprite->angle) < d->ray.fov / 2 || d_abs(sprite->angle) >
-		2 * M_PI - d->ray.fov / 2)
+	if (d_abs(sprite->angle) < d->ray.fov / 2. + 0.2 || d_abs(sprite->angle) >
+		2 * M_PI - d->ray.fov / 2 - 0.2)
 		sprite->visible = 1;
 }
 
@@ -144,15 +141,18 @@ void	sprite_display(t_data *d, t_st *sprite)
 	double	wall_dist;
 
 //	s.heigth = (d->map.sq_size / sprite->dist) * d->dist_plane;
-	s.heigth = d->dist_plane / (cos(sprite->angle) * sprite->dist / d->map.sq_size);	
+	s.heigth = d->dist_plane / (cos(sprite->angle) * sprite->dist /
+		d->map.sq_size);
 	s.begin = (d->res.heigth / 2) - (s.heigth / 2);
 	s.end = s.begin + s.heigth;
 	if (s.begin < 0)
 		s.begin = 0;
 	if (s.end > d->res.heigth)
 		s.end = d->res.heigth;
-x_begin = (double)(d->res.width / 2.0) + tan(sprite->angle) * (double)(d->res.width / 2.0) / tan(d->ray.fov / 2.0) - s.heigth / 2;	
-//	x_begin = d->dist_plane * tan(sprite->angle) + (d->res.width / 2.0) -	(s.heigth / 2);
+	x_begin = (double)(d->res.width / 2.0) + tan(sprite->angle) *
+		(double)(d->res.width / 2.0) / tan(d->ray.fov / 2.0) - s.heigth / 2;
+//	x_begin = d->dist_plane * tan(sprite->angle) + (d->res.width / 2.0) -
+	//	(s.heigth / 2);
 	s.transparence = find_text_pixel(d->color.s, 0, 0);
 	sprite_draw(d, sprite, &s, x_begin);
 }
@@ -334,7 +334,7 @@ void	find_vt_hit(t_data *d)
 int		find_text_pixel(t_t text, int x_texture, int y_texture)
 {
 	char	*color;
-	
+
 	if (y_texture < 0)
 		y_texture = 0;
 	if (y_texture > text.heigth)
@@ -354,7 +354,7 @@ void	disp_wall_text(t_data *d, int col, t_rend *wall, t_t *text)
 	if (d->ray.found_h)
 		wall->text.x = fmod(d->ray.h_hit_x / d->map.sq_size, 1) * text->width;
 	if ((d->ray.down && d->ray.found_h) || (d->ray.left && d->ray.found_v))
-		wall->text.x = 64 - wall->text.x;
+		wall->text.x = text->width - 1 - wall->text.x;
 	if (wall->begin < 0)
 		wall->begin = 0;
 	if (wall->end > d->res.heigth)
@@ -400,10 +400,13 @@ void	cast_rays(t_data *d)
 	column = 0;
 	d->dist_plane = (d->res.width / 2) / tan(d->ray.fov / 2);
 	//d->ray.ray_angle = d->cam.rotate_angle - (d->ray.fov / 2);
-	d->ray.ray_angle = d->cam.rotate_angle + atan((column - (d->res.width / 2)) / ((d->res.width / 2) / tan((d->ray.fov / 2))));	
+	//d->ray.ray_angle = d->cam.rotate_angle + atan((column -
+		//(d->res.width / 2)) / ((d->res.width / 2) / tan((d->ray.fov / 2))));
 	while (column < d->ray.nb_rays)
 	{
-		d->ray.ray_angle += d->ray.fov / d->res.width;
+		d->ray.ray_angle = d->cam.rotate_angle + atan((column - (d->res.width /
+			2)) / d->dist_plane);
+	//	d->ray.ray_angle += d->ray.fov / d->res.width;
 		d->ray.ray_angle = normalize_angle(d->ray.ray_angle);
 		ray_dir(d);
 		find_hz_hit(d);
@@ -441,16 +444,17 @@ void	player_move(t_data *d)
 	double	old_x;
 	double	old_y;
 
-	move_step = d->cam.walk_dir * d->cam.move_speed;
 	old_x = d->cam.x;
 	old_y = d->cam.y;
-	if (d->cam.side_move == 1)
+	if (d->cam.side_dir)
 	{
+		move_step = d->cam.side_dir * d->cam.move_speed;
 		d->cam.x += cos(d->cam.rotate_angle + M_PI_2) * move_step;
 		d->cam.y += sin(d->cam.rotate_angle + M_PI_2) * move_step;
 	}
-	else
+	if (d->cam.walk_dir)
 	{
+		move_step = d->cam.walk_dir * d->cam.move_speed;
 		d->cam.x += cos(d->cam.rotate_angle) * move_step;
 		d->cam.y += sin(d->cam.rotate_angle) * move_step;
 	}
@@ -542,7 +546,6 @@ int		check_error_arguments(t_data *d, int argc, char **argv)
 	if (error_state)
 	{
 		printf("please enter program name followed by [map_description].cub.");
-		printf("You can use option --save if needed\n");
 		exit(EXIT_FAILURE);
 	}
 	return (error_state);
