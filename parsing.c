@@ -14,6 +14,20 @@ int		ft_str_is_numeric(char *str)
 	return (1);
 }
 
+int		ft_count_elem(char *str, char c)
+{
+	int count;
+
+	count = 0;
+	while (*str)
+	{
+		if (*str == c)
+			count++;
+		str++;
+	}
+	return (count);
+}
+
 void	free_split(char ***split)
 {
 	int i;
@@ -70,6 +84,7 @@ int		is_full_tab(int *tab, int size)
 
 void	error(char *str, t_data *d)
 {
+	printf("Error\n");
 	printf("%s", str);
 	free_struct(d);
 	free_mlx(d);
@@ -140,9 +155,14 @@ int		*get_color_tab(t_data *d, char ***split, int **rgb)
 
 void	parse_color(t_data *d, char *line)
 {
+	int	comas;
+
+	comas = ft_count_elem(line, ',');
+	if (comas != 2)
+		error("color rgb wrong number of elements\n", d);
 	d->pars.split = ft_split(line, ',');
 	if (count_strtab_elem(d->pars.split) != 3)
-		error("color rgb wrong number of element\n", d);
+		error("color rgb wrong number of elements\n", d);
 	if (ft_strncmp(d->pars.split[0], "C ", 2) == 0)
 	{
 		d->pars.rgb = get_color_tab(d, &d->pars.split, &d->pars.rgb);

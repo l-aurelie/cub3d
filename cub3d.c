@@ -373,6 +373,7 @@ void	disp_wall_text(t_data *d, int col, t_rend *wall, t_t *text)
 void	wall_display(t_data *d, int column)
 {
 	t_rend	wall;
+	t_ipos pos;
 	double	correct_dist;
 
 	correct_dist = d->ray.ray_dist[column] * cos(d->ray.ray_angle -
@@ -381,8 +382,11 @@ void	wall_display(t_data *d, int column)
 	wall.heigth = (d->map.sq_size / correct_dist) * d->dist_plane;
 	wall.begin = (d->res.heigth / 2) - (wall.heigth / 2);
 	wall.end = wall.begin + wall.heigth;
-	disp_vertical_line(d, column, 0, wall.begin, d->color.ceiling);
-	disp_vertical_line(d, column, wall.end, d->res.heigth, d->color.floor);
+	pos.x = column;
+	pos.y = 0;
+	disp_vertical_line(d, pos, wall.begin, d->color.ceiling);
+	pos.y = wall.end;
+	disp_vertical_line(d, pos, d->res.heigth, d->color.floor);
 	if (d->ray.up && d->ray.found_h)
 		disp_wall_text(d, column, &wall, &d->color.no);
 	else if (d->ray.down && d->ray.found_h)
@@ -421,13 +425,18 @@ void	ft_mini_map(t_data *d)
 {
 	int width_minimap;
 	int heigth_minimap;
+	t_sq square;
 
+	square.width = 16;
+	square.ratio = 0.2;
+	square.pos.x = d->cam.x - 8;
+	square.pos.y = d->cam.y - 8;
 	width_minimap = d->map.width * d->map.sq_size * 0.2;
 	heigth_minimap = d->map.heigth * d->map.sq_size * 0.2;
 	if (width_minimap < d->res.width / 2 && heigth_minimap < d->res.heigth / 2)
 	{
-		ft_disp_minimap(d->map, d->ptr, d);
-		disp_square(d->cam.x * 0.2, d->cam.y * 0.2, 0xff0000, d, 10 * 0.2);
+		ft_disp_minimap(d->map, d);
+		disp_square(square, 0xff0000, d);
 	}
 }
 
@@ -477,6 +486,7 @@ int		ft_loop(t_data *d)
 
 void	free_mlx(t_data *d)
 {
+	printf("free mlx");
 	if (d->ptr.img)
 		mlx_destroy_image(d->ptr.mlx, d->ptr.img);
 	if (d->color.no.img)

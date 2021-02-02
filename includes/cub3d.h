@@ -33,6 +33,13 @@ typedef struct	s_dpos
 	double	y;
 }				t_dpos;
 
+typedef struct	s_sq
+{
+	t_ipos pos;
+	int width;
+	double ratio;
+}				t_sq;
+
 typedef struct	s_pa
 {
 	int		save;
@@ -171,14 +178,14 @@ typedef struct	s_d
 	double	dist_plane;
 }				t_data;
 
-void	disp_square(int x, int y, int color, t_data *d, int width);
+void	disp_square(t_sq square, int color, t_data *d);
 void	ft_set_params(t_data *d);
-void	disp_vertical_line(t_data *d, int x, int y1, int y2, int color);
+void	disp_vertical_line(t_data *d, t_ipos pos, int y2, int color);
 void	draw_line(int x0, int y0, int x1, int y1, int color, t_data *d);
 void	parse_cub(char *map, t_data *d);
 void	my_pixel_put(t_data *d, int x, int y, int color);
 void	print_map(t_m map);
-void	ft_disp_minimap(t_m map, t_p ptr, t_data *d);
+void	ft_disp_minimap(t_m map, t_data *d);
 void	ft_disp_map(t_m map, t_p ptr, t_data *d);
 void	error_index(t_data *d, char *line, int *all_elem, int index);
 void	calculate_dist_sprite(t_st *sprite, t_data *d);
@@ -191,12 +198,11 @@ int		ft_abs(int x);
 double	d_abs(double x);
 double  normalize_angle(double angle);
 int		find_text_pixel(t_t text, int x_texture, int y_texture);
-void	init_player(t_data *d);
+void	init_player(t_data *d, int i, int j);
 void	ft_set_map(t_data *d, t_m *map);
 void	error(char *sterror, t_data *d);
 void	parse_map(t_data *d);
 int		ft_exit_game(t_data *d);  
-//int		ft_free(void **ptr);
 void	free_matrix(int ***matrix, int heigth);
 void	free_mlx(t_data *d);
 void	free_struct(t_data *d);

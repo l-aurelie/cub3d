@@ -6,7 +6,7 @@
 /*   By: aleconte <aleconte@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/17 16:28:57 by aleconte          #+#    #+#             */
-/*   Updated: 2020/12/06 15:47:47 by aleconte         ###   ########.fr       */
+/*   Updated: 2021/02/02 17:06:43 by aleconte         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,7 @@ char	*ft_substr(char *s, int start, int len, int to_free)
 	if (sub == NULL)
 		return (NULL);
 	while (i < size)
-	{
 		sub[i++] = s[start++];
-	//	i++;
-	//	start++;
-	}
 	sub[i] = 0;
 	if (to_free == 1)
 		ft_free((void **)&s);

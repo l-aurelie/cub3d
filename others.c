@@ -14,22 +14,22 @@ double	d_abs(double x)
 	return (x);
 }
 
-void	disp_vertical_line(t_data *d, int x, int y1, int y2, int color)
+void	disp_vertical_line(t_data *d, t_ipos pos, int y2, int color)
 {
 	int j;
 
-	if (y1 < 0)
+	if (pos.y < 0)
 	{
-		y1 = 0;
+		pos.y = 0;
 	}
-	j = y1;
+	j = pos.y;
 	if (y2 > d->res.heigth)
 	{
 		y2 = d->res.heigth;
 	}
 	while (j < y2)
 	{
-		my_pixel_put(d, x, j, color);
+		my_pixel_put(d, pos.x, j, color);
 		j++;
 	}
 }
@@ -42,18 +42,24 @@ void	my_pixel_put(t_data *d, int x, int y, int color)
 	*(unsigned int*)dst = color;
 }
 
-void	disp_square(int x, int y, int color, t_data *d, int width)
+void	disp_square(t_sq square, int color, t_data *d)
 {
 	int i;
 	int j;
 
-	j = y + width;
-	while (j >= y)
+	if (square.ratio)
 	{
-		i = x + width;
-		while (i >= x)
+		square.width *= square.ratio;
+		square.pos.x *= square.ratio;
+		square.pos.y *= square.ratio;
+	}
+	j = square.pos.y + square.width;
+	while (j >= square.pos.y)
+	{
+		i = square.pos.x + square.width;
+		while (i >= square.pos.x)
 		{
-			if (j == y || i == x)
+			if (j == square.pos.y || i == square.pos.x)
 				my_pixel_put(d, i, j, 0xd3d3d3);
 			else
 				my_pixel_put(d, i, j, color);
@@ -63,31 +69,28 @@ void	disp_square(int x, int y, int color, t_data *d, int width)
 	}
 }
 
-void	ft_disp_minimap(t_m map, t_p ptr, t_data *d)
+void	ft_disp_minimap(t_m map, t_data *d)
 {
-	int i;
-	int j;
-	int tileX;
-	int tileY;
+	int		i;
+	int		j;
+	t_sq	square;
 
-	i = 0;
 	j = 0;
+	square.ratio = 0.2;
+	square.width = map.sq_size;
 	while (j < map.heigth)
 	{
 		i = 0;
 		while (i < map.width)
 		{
-			tileX = i * map.sq_size;
-			tileY = j * map.sq_size;
+			square.pos.x = i * map.sq_size;
+			square.pos.y = j * map.sq_size;
 			if (map.grid[j][i] == '1')
-				disp_square(0.2 * tileX, 0.2 * tileY, 0x000000, d, 0.2 *
-					map.sq_size);
+				disp_square(square, 0x000000, d);
 			else if (map.grid[j][i] == '0')
-				disp_square(0.2 * tileX, 0.2 * tileY, 0xffffff, d, 0.2 *
-					map.sq_size);
+				disp_square(square, 0xffffff, d);
 			else if (map.grid[j][i] == '2')
-				disp_square(0.2 * tileX, 0.2 * tileY, 0xa9a9a9, d, 0.2 *
-					map.sq_size);
+				disp_square(square, 0xa9a9a9, d);
 			i++;
 		}
 		j++;

@@ -8,17 +8,16 @@ struct __attribute__((__packed__))	s_px
 	unsigned char b;
 	unsigned char g;
 	unsigned char r;
-};				
+};
 
-
-typedef struct s_h		t_h;		
+typedef struct s_h		t_h;
 struct __attribute__((__packed__))	s_h
 {
 	char			signature[2];
 	unsigned int	size_file;
 	unsigned int	reserved;
 	unsigned int	offset;
-};		
+};
 
 typedef struct s_i		t_i;
 struct __attribute__((__packed__))	s_i

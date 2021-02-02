@@ -6,7 +6,7 @@
 /*   By: aleconte <aleconte@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/17 16:26:42 by aleconte          #+#    #+#             */
-/*   Updated: 2020/11/20 00:16:29 by aleconte         ###   ########.fr       */
+/*   Updated: 2021/02/02 17:09:30 by aleconte         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 char	*ft_strtrim(char *s1, char const *set, int to_free)
 {
-	int	len;
+	int		len;
 	char	*trimmed;
 	char	*need_free;
 
@@ -33,7 +33,7 @@ char	*ft_strtrim(char *s1, char const *set, int to_free)
 		trimmed = ft_substr(s1, 0, len + 1, 0);
 		ft_free((void **)&need_free);
 	}
-	else	
+	else
 		trimmed = ft_substr(s1, 0, len + 1, 0);
 	return (trimmed);
 }
