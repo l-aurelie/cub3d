@@ -6,7 +6,7 @@
 /*   By: aleconte <aleconte@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/02 22:23:34 by aleconte          #+#    #+#             */
-/*   Updated: 2021/02/03 00:08:48 by aleconte         ###   ########.fr       */
+/*   Updated: 2021/02/03 16:00:15 by aleconte         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	ft_set_params(t_data *d)
 		error("fonction mlx_new_image goes wrong\n", d);
 	d->ptr.imgs = mlx_get_data_addr(d->ptr.img, &d->color.bpp,
 		&d->res.size_line, &d->color.endian);
-	d->cam.move_speed = 2.0;
+	d->cam.move_speed = 3.2;
 	d->cam.rotate_speed = 2.0 * (M_PI / 180);
 	d->ray.fov = 60 * (M_PI / 180);
 	d->ray.nb_rays = d->res.width;

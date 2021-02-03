@@ -6,21 +6,13 @@
 /*   By: aleconte <aleconte@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/02 23:31:43 by aleconte          #+#    #+#             */
-/*   Updated: 2021/02/02 23:31:45 by aleconte         ###   ########.fr       */
+/*   Updated: 2021/02/03 15:07:02 by aleconte         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef BMP_H
 # define BMP_H
 # include "cub3d.h"
-
-typedef struct s_px		t_px;
-struct __attribute__((__packed__))	s_px
-{
-	unsigned char b;
-	unsigned char g;
-	unsigned char r;
-};
 
 typedef struct s_h		t_h;
 struct __attribute__((__packed__))	s_h

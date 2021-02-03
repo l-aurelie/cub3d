@@ -6,7 +6,7 @@
 /*   By: aleconte <aleconte@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/02 21:42:04 by aleconte          #+#    #+#             */
-/*   Updated: 2021/02/03 00:11:47 by aleconte         ###   ########.fr       */
+/*   Updated: 2021/02/03 12:31:26 by aleconte         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,17 @@
 int		key_press(int key, t_data *d)
 {
 	if (key == KEY_W)
-		d->cam.walk_dir = 1;
+		d->cam.walk_dir += 1;
 	else if (key == KEY_S)
-		d->cam.walk_dir = -1;
+		d->cam.walk_dir -= 1;
 	else if (key == KEY_D)
-		d->cam.side_dir = 1;
+		d->cam.side_dir += 1;
 	else if (key == KEY_A)
-		d->cam.side_dir = -1;
+		d->cam.side_dir -= 1;
 	else if (key == KEY_LEFT)
-		d->cam.turn_dir = -1;
+		d->cam.turn_dir -= 1;
 	else if (key == KEY_RIGHT)
-		d->cam.turn_dir = 1;
+		d->cam.turn_dir += 1;
 	else if (key == KEY_ESC)
 		ft_exit_game(d);
 	return (0);
@@ -34,17 +34,17 @@ int		key_press(int key, t_data *d)
 int		key_release(int key, t_data *d)
 {
 	if (key == KEY_W)
-		d->cam.walk_dir = 0;
+		d->cam.walk_dir -= 1;
 	else if (key == KEY_S)
-		d->cam.walk_dir = 0;
+		d->cam.walk_dir += 1;
 	else if (key == KEY_D)
-		d->cam.side_dir = 0;
+		d->cam.side_dir -= 1;
 	else if (key == KEY_A)
-		d->cam.side_dir = 0;
+		d->cam.side_dir += 1;
 	else if (key == KEY_LEFT)
-		d->cam.turn_dir = 0;
+		d->cam.turn_dir += 1;
 	else if (key == KEY_RIGHT)
-		d->cam.turn_dir = 0;
+		d->cam.turn_dir -= 1;
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: aleconte <aleconte@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/02 21:30:19 by aleconte          #+#    #+#             */
-/*   Updated: 2021/02/03 00:11:23 by aleconte         ###   ########.fr       */
+/*   Updated: 2021/02/03 15:49:41 by aleconte         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ int		check_error_arguments(t_data *d, int argc, char **argv)
 	}
 	if (error_state)
 	{
-		printf("please enter program name followed by [map_description].cub.");
+		printf("Error\nplease enter program name followed by [...].cub.");
 		exit(EXIT_FAILURE);
 	}
 	return (error_state);

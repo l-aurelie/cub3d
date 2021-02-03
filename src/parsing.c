@@ -6,7 +6,7 @@
 /*   By: aleconte <aleconte@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/02 21:54:23 by aleconte          #+#    #+#             */
-/*   Updated: 2021/02/03 00:10:00 by aleconte         ###   ########.fr       */
+/*   Updated: 2021/02/03 15:38:56 by aleconte         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,8 @@ void	parse_cub(char *map, t_data *d)
 
 	ret = 1;
 	fd = open(map, O_RDONLY);
+	if (read(fd, 0, 0) == -1)
+		error("file .cub can't be read\n", d);
 	get_display_data(d, &ret, fd);
 	d->map.s_map = ft_strdup("\0");
 	d->pars.line = ft_strdup("\0");

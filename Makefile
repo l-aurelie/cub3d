@@ -6,7 +6,7 @@
 #    By: aleconte <aleconte@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/02/02 22:39:56 by aleconte          #+#    #+#              #
-#    Updated: 2021/02/03 00:05:39 by aleconte         ###   ########.fr        #
+#    Updated: 2021/02/03 01:03:43 by aleconte         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,7 +40,9 @@ minilibx :
 $(NAME) : ${OBJS}
 		  ${CC} -o ${NAME} ${OBJS} ${CFLAGS} ${LDFLAGS} ${LDLIBS}
 
-clean :   
+clean :  
+			make -C libft clean
+			make -C ${MLX_DIR} clean 
 					${RM} ${OBJS}
 
 fclean :  clean

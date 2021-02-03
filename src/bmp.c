@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: aleconte <aleconte@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/02 21:39:05 by aleconte          #+#    #+#             */
-/*   Updated: 2021/02/03 00:09:03 by aleconte         ###   ########.fr       */
+/*   Created: 2021/02/03 15:02:45 by aleconte          #+#    #+#             */
+/*   Updated: 2021/02/03 15:07:08 by aleconte         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,45 +24,19 @@ void	get_header_info(t_data *d, t_i *head_info, t_h *header)
 	head_info->width = d->res.width;
 	head_info->heigth = d->res.heigth;
 	head_info->nb_color_planes = 1;
-	head_info->bit_per_pix = 24;
-}
-
-int		find_img_pixel(t_data *d, int x, int y)
-{
-	char	*color;
-
-	if (y < 0)
-		y = 0;
-	if (y > d->res.heigth)
-		y = d->res.heigth;
-	if (x < 0)
-		x = 0;
-	if (x > d->res.width)
-		x = d->res.width;
-	color = d->ptr.imgs + (y * d->res.size_line + x * d->color.bpp / 8);
-	return (*(int*)color);
+	head_info->bit_per_pix = d->color.bpp;
 }
 
 void	bmp_image(t_data *d, int fd)
 {
-	int		i;
-	int		j;
-	int		color;
-	t_px	pix[d->res.width];
+	int	i;
 
 	i = d->res.heigth;
-	while (--i >= 0)
+	while (i >= 0)
 	{
-		j = 0;
-		while (j < d->res.width)
-		{
-			color = find_img_pixel(d, j, i);
-			pix[j].b = color >> 0;
-			pix[j].g = color >> 8;
-			pix[j].r = color >> 16;
-			++j;
-		}
-		write(fd, pix, sizeof(pix));
+		write(fd, d->ptr.imgs + (i * d->res.width * d->color.bpp / 8),
+				d->res.size_line);
+		i--;
 	}
 }
 

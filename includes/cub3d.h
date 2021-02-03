@@ -6,7 +6,7 @@
 /*   By: aleconte <aleconte@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/02 23:18:49 by aleconte          #+#    #+#             */
-/*   Updated: 2021/02/02 23:29:51 by aleconte         ###   ########.fr       */
+/*   Updated: 2021/02/03 15:06:39 by aleconte         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,7 +188,6 @@ typedef struct	s_data
 }				t_data;
 
 void			get_header_info(t_data *d, t_i *head_info, t_h *header);
-int				find_img_pixel(t_data *d, int x, int y);
 void			bmp_image(t_data *d, int fd);
 void			ft_create_bmp(t_data *d);
 
